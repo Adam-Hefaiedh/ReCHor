@@ -13,7 +13,7 @@ class MyPackedCriteriaTest3 {
     private static final int VALID_PAYLOAD = 0x12345678;
 
     private static final int MIN_VALID_MINS = -240; // -4:00, minimum valid time
-    private static final int MAX_VALID_MINS = 3119; // 47:59, maximum valid time
+    private static final int MAX_VALID_MINS = 2879; // 47:59, maximum valid time
 
     @Test
     void packWithoutDepTimeShouldCreateValidPackedCriteria() {
@@ -101,7 +101,7 @@ class MyPackedCriteriaTest3 {
                 VALID_DEP_MINS + 30);
 
         assertFalse(PackedCriteria.dominatesOrIsEqual(earlierDepartLaterArrive, laterDepartEarlierArrive));
-        assertFalse(PackedCriteria.dominatesOrIsEqual(laterDepartEarlierArrive, earlierDepartLaterArrive));
+        assertTrue(PackedCriteria.dominatesOrIsEqual(laterDepartEarlierArrive, earlierDepartLaterArrive));
     }
 
     // Edge cases

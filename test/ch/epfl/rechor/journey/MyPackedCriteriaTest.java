@@ -75,9 +75,8 @@ public class MyPackedCriteriaTest {
     void edgeCaseTesting(){
 
         long critere1 = PackedCriteria.pack(-240, 126, ~0);
-        System.out.println(critere1);
-        PackedCriteria.withAdditionalChange(critere1);
         assertThrows(IllegalArgumentException.class, () -> PackedCriteria.withDepMins(critere1, 2880));
+        long critere1_4 = PackedCriteria.withAdditionalChange(critere1);
         long critere1_2 = PackedCriteria.withDepMins(critere1, 2879);
 
         assertEquals(2879, PackedCriteria.depMins(critere1_2));
@@ -85,9 +84,43 @@ public class MyPackedCriteriaTest {
 
         long critere1_3 = PackedCriteria.withoutDepMins(critere1_2);
         assertThrows(IllegalArgumentException.class, () -> PackedCriteria.depMins(critere1_3));
-        
 
     }
+
+    @Test
+    void testValidationAndInvalidInputs() {
+        // Invalid arrival minutes
+        assertThrows(IllegalArgumentException.class, () -> PackedCriteria.pack(-241, 0, 0));
+        assertThrows(IllegalArgumentException.class, () -> PackedCriteria.pack(2880, 0, 0));
+
+        // Invalid changes
+        assertThrows(IllegalArgumentException.class, () -> PackedCriteria.pack(0, -1, 0));
+        assertThrows(IllegalArgumentException.class, () -> PackedCriteria.pack(0, 128, 0));
+
+        // Invalid departure minutes when adding them
+        long criteria = PackedCriteria.pack(540, 2, 0);
+        assertThrows(IllegalArgumentException.class, () -> PackedCriteria.withDepMins(criteria, -241));
+        assertThrows(IllegalArgumentException.class, () -> PackedCriteria.withDepMins(criteria, 2880));
+    }
+
+    @Test
+    void testComplexDominationRelationships() {
+        long c1 = PackedCriteria.pack(540, 2, 0);
+        long c2 = PackedCriteria.pack(560, 1, 0);
+
+        c1 = PackedCriteria.withDepMins(c1, 480);
+        c2 = PackedCriteria.withDepMins(c2, 500);
+
+        assertFalse(PackedCriteria.dominatesOrIsEqual(c1, c2));
+        assertFalse(PackedCriteria.dominatesOrIsEqual(c2, c1));
+
+        long c3 = PackedCriteria.pack(520, 3, 0);
+        c3 = PackedCriteria.withDepMins(c3, 450);
+
+        assertFalse(PackedCriteria.dominatesOrIsEqual(c1, c3));
+        assertFalse(PackedCriteria.dominatesOrIsEqual(c3, c1));
+    }
+
 
 
 }

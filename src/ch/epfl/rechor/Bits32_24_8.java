@@ -5,6 +5,9 @@ package ch.epfl.rechor;
  * respectivement empaquetées dans un entier de 32 bits de type int.
  */
 public class Bits32_24_8 {
+    private static final int BITS_8 = 8;
+    private static final int BITS_24 = 24;
+
 
     private Bits32_24_8(){}
 
@@ -18,8 +21,8 @@ public class Bits32_24_8 {
      * @return le vecteur de 32 bits
      */
     public static int pack(int bits24, int bits8){
-        Preconditions.checkArgument(bits24 >> 24==0 && bits8 >> 8==0);
-        return (bits24 << 8) | bits8;
+        Preconditions.checkArgument(bits24 >> BITS_24==0 && bits8 >> BITS_8==0);
+        return (bits24 << BITS_8) | bits8;
     }
 
     /**
@@ -29,7 +32,7 @@ public class Bits32_24_8 {
      * @return les 24 bits de poids fort
      */
     public static int unpack24(int bits32){
-        return bits32 >>> 8;
+        return bits32 >>> BITS_8;
     }
 
     /**

@@ -1,12 +1,21 @@
 package ch.epfl.rechor.journey;
 
 import ch.epfl.rechor.Preconditions;
+import com.sun.jdi.PrimitiveValue;
+
 import static java.lang.Integer.toUnsignedLong;
 /**
  * La classe permet de manipuler des critères d'optimisation augmentés,
  * empaquetés dans des valeurs de type long.
  */
 public class PackedCriteria {
+    private final static int MINIMUM_HOURS = -240;
+    private final static int MAXIMUM_HOURS = 2880;
+    private final static int MAX_BIT_CHANGE = 32;
+    private final static int MAX_BIT_DEPART = 51;
+    private final static int MAX_BIT_ARR = 39;
+    private final static int MAX_HOURS_POSSIBLE = 4095;
+
 
     private PackedCriteria(){}
 
@@ -22,9 +31,9 @@ public class PackedCriteria {
      * @return valeur de type long empaquetant les 3 valeurs
      */
     public static long pack(int arrMins, int changes, int payload){
-        Preconditions.checkArgument(arrMins >= -240 && arrMins < 2880);
+        Preconditions.checkArgument(arrMins >= MINIMUM_HOURS && arrMins < MAXIMUM_HOURS);
         Preconditions.checkArgument(changes >> 7 == 0);
-        return toUnsignedLong(arrMins+240) << 39 | toUnsignedLong(changes) << 32 | toUnsignedLong(payload);
+        return toUnsignedLong(arrMins- MINIMUM_HOURS) << MAX_BIT_ARR | toUnsignedLong(changes) <<  MAX_BIT_CHANGE | toUnsignedLong(payload);
     }
 
     /**
@@ -35,7 +44,7 @@ public class PackedCriteria {
      */
     public static boolean hasDepMins(long criteria)
     {
-        return criteria >>> 51 != 0;
+        return criteria >>>  MAX_BIT_DEPART != 0;
     }
 
     /**
@@ -47,7 +56,7 @@ public class PackedCriteria {
      */
     public static int depMins(long criteria){
         Preconditions.checkArgument(hasDepMins(criteria));
-        return 4095 - (int)(criteria >>> 51) -240;
+        return MAX_HOURS_POSSIBLE - (int)(criteria >>>  MAX_BIT_DEPART) + MINIMUM_HOURS;
     }
 
     /**
@@ -60,7 +69,7 @@ public class PackedCriteria {
     public static int arrMins(long criteria)
     {
 
-        return (int)(criteria >>> 39 & 4095) -240;
+        return (int)(criteria >>> MAX_BIT_ARR & MAX_HOURS_POSSIBLE) + MINIMUM_HOURS;
     }
 
     /*
@@ -72,7 +81,7 @@ public class PackedCriteria {
      */
     public static int changes(long criteria)
     {
-        return (int) (criteria >> 32 & 127);
+        return (int) (criteria >>  MAX_BIT_CHANGE & 127);
     }
 
     /**
@@ -128,9 +137,9 @@ public class PackedCriteria {
      */
     public static long withDepMins(long criteria, int depMins1)
     {
-        Preconditions.checkArgument(depMins1 >= -240 && depMins1 < 2880);
-        int depMins2 = 4095 - depMins1 -240;
-        return (withoutDepMins(criteria)) | (long)(depMins2) << 51;
+        Preconditions.checkArgument(depMins1 >= MINIMUM_HOURS && depMins1 < MAXIMUM_HOURS);
+        int depMins2 = MAX_HOURS_POSSIBLE - depMins1 + MINIMUM_HOURS;
+        return (withoutDepMins(criteria)) | (long)(depMins2) <<  MAX_BIT_DEPART;
     }
 
     /**
@@ -142,7 +151,7 @@ public class PackedCriteria {
      */
     public static long withAdditionalChange(long criteria)
     {
-        return criteria + (1L << 32);
+        return criteria + (1L <<  MAX_BIT_CHANGE);
     }
 
     /**
