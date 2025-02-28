@@ -1,10 +1,15 @@
 package ch.epfl.rechor.journey;
 
+import ch.epfl.rechor.Preconditions;
+import static java.lang.Integer.toUnsignedLong;
 /**
  * La classe permet de manipuler des critères d'optimisation augmentés,
  * empaquetés dans des valeurs de type long.
  */
-public final class PackedCriteria {
+public class PackedCriteria {
+
+    private PackedCriteria(){}
+
     /**
      * retourne la valeur de type long résultant de l'empaquetage de l'heure d'arrivée,
      * du nombre de changements et de la «charge utile» donnés
@@ -19,7 +24,7 @@ public final class PackedCriteria {
     public static long pack(int arrMins, int changes, int payload){
         Preconditions.checkArgument(arrMins >= -240 && arrMins < 2880);
         Preconditions.checkArgument(changes >> 7 == 0);
-        return Integer.toUnsignedLong(arrMins) << 39 | Integer.toUnsignedLong(changes) << 32 | payload;
+        return toUnsignedLong(arrMins+240) << 39 | toUnsignedLong(changes) << 32 | toUnsignedLong(payload);
     }
 
     /**
@@ -30,7 +35,7 @@ public final class PackedCriteria {
      */
     public static boolean hasDepMins(long criteria)
     {
-        return criteria >> 51 != 0;
+        return criteria >>> 51 != 0;
     }
 
     /**
@@ -42,7 +47,7 @@ public final class PackedCriteria {
      */
     public static int depMins(long criteria){
         Preconditions.checkArgument(hasDepMins(criteria));
-        return (int) (criteria >> 51);
+        return 4095 - (int)(criteria >>> 51) -240;
     }
 
     /**
@@ -54,10 +59,11 @@ public final class PackedCriteria {
      */
     public static int arrMins(long criteria)
     {
-        return (int) criteria >> 39 & 4095;
+
+        return (int)(criteria >>> 39 & 4095) -240;
     }
 
-    /**
+    /*
      * Retourne le nombre de changements
      * des critères empaquetés donnés
      * @param criteria
@@ -66,7 +72,7 @@ public final class PackedCriteria {
      */
     public static int changes(long criteria)
     {
-        return (int) criteria >> 32 & 127;
+        return (int) (criteria >> 32 & 127);
     }
 
     /**
@@ -77,7 +83,7 @@ public final class PackedCriteria {
      * @return la «charge utile»
      */
     public static int payload(long criteria){
-        return (int) (criteria & 0xFFFFFFFFL);
+        return (int) (criteria);
     }
 
     /**
@@ -90,24 +96,14 @@ public final class PackedCriteria {
      * @return vrai si les premiers critères empaquetés dominent ou sont égaux aux seconds
      */
     public static boolean dominatesOrIsEqual(long criteria1, long criteria2){
-        int avantage1 = 0;
-        int avantage2 = 0;
         Preconditions.checkArgument(hasDepMins(criteria1) == hasDepMins(criteria2));
-        int[][] values = {
-                {depMins(criteria1), depMins(criteria2)},
-                {arrMins(criteria1), arrMins(criteria2)},
-                {changes(criteria1), changes(criteria2)}
-        };
-
-        for (int[] pair : values) {
-            if (pair[0] < pair[1]) {
-                avantage1++;
-            } else if (pair[1] < pair[0]) {
-                avantage2++;
-            }
+        if(hasDepMins(criteria1))
+        {
+           return depMins(criteria1) >= depMins(criteria2) && arrMins(criteria1) <= arrMins(criteria2) && changes(criteria1) <= changes(criteria2);
         }
-
-        return avantage1 >= avantage2;
+        else {
+            return arrMins(criteria1) <= arrMins(criteria2) && changes(criteria1) <= changes(criteria2);
+        }
     }
 
     /**
@@ -132,7 +128,9 @@ public final class PackedCriteria {
      */
     public static long withDepMins(long criteria, int depMins1)
     {
-        return withoutDepMins(criteria) | Integer.toUnsignedLong(depMins1) << 51;
+        Preconditions.checkArgument(depMins1 >= -240 && depMins1 < 2880);
+        int depMins2 = 4095 - depMins1 -240;
+        return (withoutDepMins(criteria)) | (long)(depMins2) << 51;
     }
 
     /**
@@ -144,7 +142,7 @@ public final class PackedCriteria {
      */
     public static long withAdditionalChange(long criteria)
     {
-        return criteria + 1L << 32;
+        return criteria + (1L << 32);
     }
 
     /**
@@ -157,6 +155,6 @@ public final class PackedCriteria {
      * @return les critères empaquetés avec une nouvelle «charge utile»
      */
     public static long withPayload(long criteria, int payload1){
-        return (criteria & ~(0xFFFFFFFFL)) | Integer.toUnsignedLong(payload1);
+        return (criteria & ~(0xFFFFFFFFL)) | toUnsignedLong(payload1);
     }
 }

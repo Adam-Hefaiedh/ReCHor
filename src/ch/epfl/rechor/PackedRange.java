@@ -4,7 +4,9 @@ package ch.epfl.rechor;
  * La classe permet de manipuler des intervalles d'entiers
  * empaquetés dans un entier de type int
  */
-public final class PackedRange {
+public class PackedRange {
+
+    private PackedRange(){}
     /**
      * Retourne la valeur de type int représentant l'intervalle d'entiers allant
      * de startInclusive (inclus) à endExclusive (exclu)
@@ -16,8 +18,8 @@ public final class PackedRange {
      */
     public static int pack(int startInclusive, int endExclusive)
     {
-        int ecart = endExclusive - startInclusive;
-        return Bits32_24_8.pack(startInclusive, ecart);
+        int length = endExclusive - startInclusive;
+        return Bits32_24_8.pack(startInclusive, length);
     }
 
     /**

@@ -42,10 +42,6 @@ public final class IcalBuilder {
     // Liste des composants démarrés pour gérer la structure de l'iCalendar
     private final List<Component> startingComponents = new ArrayList<>();
 
-    /**
-     * Constructeur par defaut
-     */
-    public IcalBuilder (){}
 
     /**
      * Ajoute à l'événement en cours de construction une ligne formée du nom et de la valeur donnés,
@@ -56,7 +52,7 @@ public final class IcalBuilder {
      * @return l'instance courante de IcalBuilder pour permettre l'enchaînement des appels
      */
     public IcalBuilder add(Name name, String value){
-        String line = name.toString() + ":" + value;
+        String line = name + ":" + value;
         String foldedLine = foldLine(line);
         builder.append(foldedLine);
         return this ;
@@ -75,12 +71,15 @@ public final class IcalBuilder {
         int maxLength = 75;
         int lineLength = line.length();
         int index = 0;
+        int end = Math.min(index + maxLength, lineLength);
+        folded.append(line, index, end);
+        folded.append("\r\n");
+        index = end;
         while (index < lineLength) {
-            int end = Math.min(index + maxLength, lineLength);
+            folded.append(" ");
+            end = Math.min(index + maxLength-1, lineLength);
             folded.append(line, index, end);
-            if (end < lineLength) {
-                folded.append("\r\n ");
-            }
+            folded.append("\r\n");
             index = end;
         }
         return folded.toString();
@@ -94,7 +93,7 @@ public final class IcalBuilder {
      */
     public IcalBuilder add(Name name, LocalDateTime dateTime){
         String dateTimeStr = dateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"));
-        builder.append(name.toString()).append(":").append(dateTimeStr);
+        add(name, dateTimeStr);
         return this;
     }
 
@@ -105,7 +104,7 @@ public final class IcalBuilder {
      * @return l'instance courante de IcalBuilder pour permettre l'enchaînement des appels
      */
     public IcalBuilder begin(Component component){
-        builder.append(Name.BEGIN.toString()).append(":").append(component);
+        add(Name.BEGIN, component.toString());
         startingComponents.add(component);
         return this;
     }
@@ -116,16 +115,12 @@ public final class IcalBuilder {
      * Vérifie que le dernier composant ouvert est bien celui qui doit être fermé,
      * puis le retire de la liste des composants ouverts et ajoute la ligne de fin correspondante.
      *
-     * @param component le composant à fermer (par exemple VCALENDAR ou VEVENT)
      * @return l'instance courante de IcalBuilder pour permettre l'enchaînement des appels
      */
-    public IcalBuilder end(Component component){
-        Component lastComponentOpened = startingComponents.get(startingComponents.size() - 1);
-        Preconditions.checkArgument(lastComponentOpened == component);
+    public IcalBuilder end(){
         Preconditions.checkArgument(!startingComponents.isEmpty());
-
-        startingComponents.remove(component);
-        builder.append(Name.END.toString()).append(":").append(component);
+        Component lastComponentOpened = startingComponents.removeLast();
+        add(Name.END,lastComponentOpened.toString());
         return this;
     }
 
@@ -138,7 +133,7 @@ public final class IcalBuilder {
      * @return la chaîne de caractères finale correspondant à l'iCalendar construit
      */
     public String build(){
-        Preconditions.checkArgument(!startingComponents.isEmpty());
+        Preconditions.checkArgument(startingComponents.isEmpty());
         return builder.toString();
     }
 }
