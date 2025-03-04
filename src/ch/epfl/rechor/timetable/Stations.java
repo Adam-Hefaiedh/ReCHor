@@ -1,9 +1,35 @@
 package ch.epfl.rechor.timetable;
 
-public interface Stations extends Indexed{
+/**
+ * L'interface Stations représente les gares indexées d'un horaire de transport public.
+ * Chaque gare est considérée comme un élément d'un tableau, identifié par un index allant de 0 à size()-1.
+ */
+public interface Stations extends Indexed {
 
-    abstract String name(int id); //retourne le nom de la gare d'index donné,
-    abstract double longitude(int id); //retourne la longitude, en degrés, de la gare d'index donné,
-    abstract double latitude(int id); //retourne la latitude, en degrés, de la gare d'index donné.
+    /**
+     * Retourne le nom de la gare correspondant à l'index donné.
+     *
+     * @param id l'index de la gare
+     * @return le nom de la gare
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
+     */
+    abstract String name(int id);
 
+    /**
+     * Retourne la longitude, en degrés, de la gare correspondant à l'index donné.
+     *
+     * @param id l'index de la gare
+     * @return la longitude de la gare en degrés
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
+     */
+    abstract double longitude(int id);
+
+    /**
+     * Retourne la latitude, en degrés, de la gare correspondant à l'index donné.
+     *
+     * @param id l'index de la gare
+     * @return la latitude de la gare en degrés
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
+     */
+    abstract double latitude(int id);
 }

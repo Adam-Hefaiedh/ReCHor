@@ -1,8 +1,28 @@
 package ch.epfl.rechor.timetable;
 
-public interface StationAliases extends Indexed{
+/**
+ * L'interface StationAliases représente les alias ou noms alternatifs des gares indexées.
+ * Les alias sont conceptualisés comme des éléments d'un tableau dont les indices vont de 0 à size()-1.
+ */
+public interface StationAliases extends Indexed {
 
-    abstract String alias(int id); //retourne le nom alternatif d'index donné (p. ex. Losanna)
-    abstract String stationName(int id); //retourne le nom de la gare à laquelle correspond le nom alternatif d'index donné (p. ex. Lausanne).
+    /**
+     * Retourne le nom alternatif de la gare pour l'index donné.
+     * Par exemple, "Losanna" peut être un alias pour "Lausanne".
+     *
+     * @param id l'index du nom alternatif
+     * @return le nom alternatif de la gare
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
+     */
+    abstract String alias(int id);
 
+    /**
+     * Retourne le nom officiel de la gare correspondant à l'alias d'index donné.
+     * Par exemple, pour l'alias "Losanna", cette méthode peut retourner "Lausanne".
+     *
+     * @param id l'index du nom alternatif
+     * @return le nom officiel de la gare associée à l'alias
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
+     */
+    abstract String stationName(int id);
 }
