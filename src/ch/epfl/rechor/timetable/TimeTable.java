@@ -21,7 +21,7 @@ public interface TimeTable {
      * @return vrai si stopId désigne une gare, faux sinon
      */
     default boolean isStationId(int stopId){
-        return stopId < stations().size();
+        return stopId <= stations().size();
     }
 
     /**
@@ -32,9 +32,9 @@ public interface TimeTable {
      * @return vrai si stopId désigne une voie ou un quai, faux sinon
      */
     default boolean isPlatformId(int stopId){
-        return stopId >= stations().size();
+        return stopId > stations().size();
     }
-    
+
     default int stationId(int stopId) {
         if (isStationId(stopId) == true) {
             return stopId;
