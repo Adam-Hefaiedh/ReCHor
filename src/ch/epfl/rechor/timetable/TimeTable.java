@@ -94,10 +94,7 @@ public interface TimeTable {
      * @return l'index de la gare associée
      */
     default int stationId(int stopId) {
-        if (isStationId(stopId)) {
-            return stopId;
-        }
-        return platforms().stationId(stopId);
+        return isStationId(stopId) ? stopId : stopId - stations().size();
     }
 
     /**
@@ -109,9 +106,6 @@ public interface TimeTable {
      * @return le nom de la voie ou du quai, ou null si l'arrêt correspond à une gare
      */
     default String platformName(int stopId) {
-        if (isPlatformId(stopId)) {
-            return platforms().name(stopId);
-        }
-        return null;
+        return isPlatformId(stopId) ? platforms().name(stopId) : null;
     }
 }

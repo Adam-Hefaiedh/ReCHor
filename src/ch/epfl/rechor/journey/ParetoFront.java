@@ -16,7 +16,7 @@ import static java.util.List.copyOf;
 public class ParetoFront {
     private final long[] tuples;
     public static final ParetoFront EMPTY = new ParetoFront(new long[0]);
-
+    
     private ParetoFront(long[] tuples){
         this.tuples = tuples;
     }
@@ -59,7 +59,10 @@ public class ParetoFront {
             action.accept(critere);
         }
     }
-
+    /**
+     * retourne une version textuelle du tableau de notre classe
+     * @return une version textuelle du tableau de notre classe
+     */
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
@@ -196,10 +199,14 @@ public class ParetoFront {
         }
 
         /**
-         *
+         *  retourne vrai si et seulement si la totalité des tuples de la frontière donnée,
+         *  une fois que leur heure de départ a été fixée sur celle donnée, sont dominés par au moins un tuple du récepteur
          * @param that
+         * La frontière donnée
          * @param depMins
-         * @return
+         * l'heure de départ  donnée
+         * @return vrai si et seulement si la totalité des tuples, de la frontière
+         * donnée, sont dominés par au moins un tuple du récepteur
          */
         public boolean fullyDominates(Builder that, int depMins){
             boolean dominate;
@@ -229,6 +236,11 @@ public class ParetoFront {
                 action.accept(tuples_build[i]);
             }
         }
+
+        /**
+         * retourne une version textuelle du tableau de notre classe
+         * @return une version textuelle du tableau de notre classe
+         */
         @Override
         public String toString(){
             StringBuilder sb = new StringBuilder();
@@ -238,6 +250,7 @@ public class ParetoFront {
             }
             return sb.toString();
         }
+
 
         /**
          * Retourne la frontière de Pareto en cours de construction par ce bâtisseur.
