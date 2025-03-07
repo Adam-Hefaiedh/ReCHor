@@ -70,7 +70,7 @@ public interface TimeTable {
      */
     default boolean isStationId(int stopId) {
         // ATTENTION : selon la convention, stopId doit être strictement inférieur à stations().size().
-        return stopId <= stations().size();
+        return stopId < stations().size();
     }
 
     /**
@@ -82,7 +82,7 @@ public interface TimeTable {
      */
     default boolean isPlatformId(int stopId) {
         // ATTENTION : selon la convention, stopId est considéré comme voie/quai si stopId > stations().size().
-        return stopId > stations().size();
+        return stopId >= stations().size();
     }
 
     /**

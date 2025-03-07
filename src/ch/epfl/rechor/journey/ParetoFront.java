@@ -151,19 +151,17 @@ public class ParetoFront {
 
             int dest = pos;
             for(int i=pos; i<size_effective; i++) {
-                if (dominatesOrIsEqual(packedTuple, tuples_build[i])){
-                    continue;
-                }
+                if (dominatesOrIsEqual(packedTuple, tuples_build[i]))continue;
                 if (dest != i) tuples_build[dest] = tuples_build[i];
                 dest += 1;
             }
 
-            long[] tuples_build2 = new long[dest+1];
+            long[] tuples_build2 = new long[dest*3/2 +1];
             arraycopy(tuples_build,0,tuples_build2,0,pos);
             arraycopy(tuples_build,pos,tuples_build2,pos+1, dest-pos);
             tuples_build2[pos] = packedTuple;
-            capacity = dest+1;
-            size_effective = capacity;
+            capacity = dest*3/2 +1;
+            size_effective = dest+1;
             tuples_build = tuples_build2;
             return this;
         }
@@ -204,20 +202,20 @@ public class ParetoFront {
          * @return
          */
         public boolean fullyDominates(Builder that, int depMins){
-            int domination;
+            boolean dominate;
             long deps;
-            if(that.size_effective == 0)return true;
-           for(int i=0; i<this.size_effective;i++){
-               domination = 0;
-               for(int j=0; j<that.size_effective;j++)
+           for(int i=0; i<that.size_effective;i++){
+               dominate = true;
+
+               deps = withDepMins(that.tuples_build[i], depMins);
+               for(int j=0; j<this.size_effective;j++)
                {
-                   deps = withDepMins(that.tuples_build[j], depMins);
-                   if(dominatesOrIsEqual(this.tuples_build[i],deps))domination++;
+                   if(dominatesOrIsEqual(this.tuples_build[j],deps))dominate = false;
                }
-               if(domination == that.size_effective) return true;
-               
+               if(dominate) return false;
+
            }
-           return false;
+           return true;
         }
 
         /**
@@ -227,8 +225,8 @@ public class ParetoFront {
          * L'action a effectuer pour chaque critères
          */
         public void forEach(LongConsumer action){
-            for(long critere : tuples_build){
-                action.accept(critere);
+            for(int i=0; i<size_effective; i++){
+                action.accept(tuples_build[i]);
             }
         }
         @Override
