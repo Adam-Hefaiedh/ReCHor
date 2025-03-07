@@ -1,5 +1,6 @@
 package ch.epfl.rechor.journey;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -7,6 +8,7 @@ import java.util.function.LongConsumer;
 
 import static ch.epfl.rechor.journey.PackedCriteria.*;
 import static java.lang.System.arraycopy;
+import static java.util.List.copyOf;
 
 /**
  * La classe représente une frontière de Pareto de critères d'optimisation.
@@ -15,20 +17,6 @@ public class ParetoFront {
     private final long[] tuples;
     public static final ParetoFront EMPTY = new ParetoFront(new long[0]);
 
-    public static void main(String[] args) {
-        Builder build = new Builder();
-        build.add(pack(480,3,2));
-        build.add(pack(480,4,22));
-        build.add(pack(481,2,23));
-        build.add(pack(482,1,25));
-        build.add(pack(483,0,23));
-        build.add(pack(484,1,21));
-        ParetoFront paretoFront = build.build();
-        for(long par : paretoFront.tuples){
-            System.out.println(arrMins(par));
-            System.out.println(changes(par));
-        }
-    }
     private ParetoFront(long[] tuples){
         this.tuples = tuples;
     }
@@ -226,9 +214,8 @@ public class ParetoFront {
                    deps = withDepMins(that.tuples_build[j], depMins);
                    if(dominatesOrIsEqual(this.tuples_build[i],deps))domination++;
                }
-               if(domination == that.size_effective) {
-                   return true;
-               }
+               if(domination == that.size_effective) return true;
+               
            }
            return false;
         }
