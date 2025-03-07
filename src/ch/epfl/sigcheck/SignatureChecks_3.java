@@ -99,11 +99,11 @@ final class SignatureChecks_3 {
     }
 
     ch.epfl.rechor.timetable.Connections v01;
-    java.lang.Object v02;
+    Object v02;
     int v03;
     ch.epfl.rechor.timetable.Indexed v04;
     ch.epfl.rechor.timetable.Platforms v05;
-    java.lang.String v06;
+    String v06;
     ch.epfl.rechor.timetable.Routes v07;
     ch.epfl.rechor.journey.Vehicle v08;
     ch.epfl.rechor.timetable.StationAliases v09;
