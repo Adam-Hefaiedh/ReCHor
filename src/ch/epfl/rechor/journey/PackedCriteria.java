@@ -72,7 +72,7 @@ public class PackedCriteria {
         return (int)(criteria >>> MAX_BIT_ARR & MAX_HOURS_POSSIBLE) + MINIMUM_HOURS;
     }
 
-    /*
+    /**
      * Retourne le nombre de changements
      * des critères empaquetés donnés
      * @param criteria

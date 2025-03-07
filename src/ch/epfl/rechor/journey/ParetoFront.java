@@ -48,6 +48,7 @@ public class ParetoFront {
             action.accept(critere);
         }
     }
+
     public static class Builder{
         private long[] tuples;
         private int capacity;
