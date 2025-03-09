@@ -16,7 +16,7 @@ import static java.util.List.copyOf;
 public class ParetoFront {
     private final long[] tuples;
     public static final ParetoFront EMPTY = new ParetoFront(new long[0]);
-    
+
     private ParetoFront(long[] tuples){
         this.tuples = tuples;
     }
@@ -132,7 +132,7 @@ public class ParetoFront {
             int size = 0;
             while(size != size_effective && pos == -1)
             {
-                if(withPayload(tuples_build[size],Integer.MAX_VALUE) <= withPayload(packedTuple,Integer.MAX_VALUE)){
+                if(tuples_build[size] <= withPayload(packedTuple,0xFFFFFFFF)){
                     if(dominatesOrIsEqual(tuples_build[size], packedTuple)){
                         return this;
                     }
