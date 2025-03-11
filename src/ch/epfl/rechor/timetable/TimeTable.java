@@ -1,5 +1,6 @@
 package ch.epfl.rechor.timetable;
 
+import javax.lang.model.element.Name;
 import java.time.LocalDate;
 
 /**
@@ -106,6 +107,6 @@ public interface TimeTable {
      * @return le nom de la voie ou du quai, ou null si l'arrêt correspond à une gare
      */
     default String platformName(int stopId) {
-        return isPlatformId(stopId) ? platforms().name(stopId) : null;
+        return isPlatformId(stopId) ? platforms().name(stopId - stations().size()) : null;
     }
 }

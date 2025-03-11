@@ -27,16 +27,11 @@ public class Structure {
     }
 
     public Structure(Field... fields){
-
-        for (int i = 0; i < fields.length; i++){
-            Preconditions.checkArgument(fields[i].index() == i );
-        }
-
         int pos = 0;
         fieldPosition = new int[fields.length];
         int size = 0;
-
-        for (int i = 0; i < fieldPosition.length; i++){
+        for (int i = 0; i < fields.length; i++){
+            Preconditions.checkArgument(fields[i].index() == i );
             fieldPosition[i] = pos;
             switch (fields[i].type()){
                 case U8 -> size = 1;
