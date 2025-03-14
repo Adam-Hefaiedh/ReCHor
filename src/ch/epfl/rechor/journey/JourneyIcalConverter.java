@@ -9,6 +9,10 @@ import java.util.UUID;
 
 public class JourneyIcalConverter {
 
+    private final static String VERSION = "2.0";
+    private final static String PRODID = "ReCHor";
+
+
     private JourneyIcalConverter() {}
 
     /**
@@ -37,8 +41,8 @@ public class JourneyIcalConverter {
         IcalBuilder builder = new IcalBuilder();
 
         builder.begin(IcalBuilder.Component.VCALENDAR)
-                .add(IcalBuilder.Name.VERSION, "2.0")
-                .add(IcalBuilder.Name.PRODID, "ReCHor")
+                .add(IcalBuilder.Name.VERSION, VERSION)
+                .add(IcalBuilder.Name.PRODID, PRODID)
                 .begin(IcalBuilder.Component.VEVENT)
                 .add(IcalBuilder.Name.UID, UUID.randomUUID().toString())
                 .add(IcalBuilder.Name.DTSTAMP, java.time.LocalDateTime.now())

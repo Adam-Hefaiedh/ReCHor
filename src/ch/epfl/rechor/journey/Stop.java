@@ -22,6 +22,11 @@ import java.util.Objects;
  *
  */
 public record Stop(String name, String platformName, double longitude, double latitude) {
+    private final static int MAX_LONGITUDE = 180;
+    private final static int MIN_LONGITUDE = -180;
+    private final static int MAX_LATITUDE = 90;
+    private final static int MIN_LATITUDE = -90;
+
     /**
      * constructeur verifiant si le nom de l'arret n'est pas null et que
      * la longitude soit entre -180 et 180 (inclus) et la latitude entre
@@ -42,6 +47,6 @@ public record Stop(String name, String platformName, double longitude, double la
      */
     public Stop{
         Objects.requireNonNull(name);
-        Preconditions.checkArgument((-180<=longitude && longitude<=180 )&&(-90<=latitude && latitude<=90 ));
+        Preconditions.checkArgument((MIN_LONGITUDE<=longitude && longitude<=MAX_LONGITUDE )&&(MIN_LATITUDE<=latitude && latitude<=MAX_LATITUDE ));
     }
 }

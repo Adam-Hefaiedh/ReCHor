@@ -1,5 +1,7 @@
 package ch.epfl.rechor.journey;
 
+import com.sun.jdi.PrimitiveValue;
+
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,6 +82,7 @@ public class ParetoFront {
         private long[] tuples_build;
         private int capacity;
         private int size_effective;
+        private static final int MAX_PAYLOAD = 0xFFFFFFFF;
 
         /**
          * retourne un bâtisseur dont la frontière en cours de construction est vide
@@ -132,7 +135,7 @@ public class ParetoFront {
             int size = 0;
             while(size != size_effective && pos == -1)
             {
-                if(tuples_build[size] <= withPayload(packedTuple,0xFFFFFFFF)){
+                if(tuples_build[size] <= withPayload(packedTuple,MAX_PAYLOAD)){
                     if(dominatesOrIsEqual(tuples_build[size], packedTuple)){
                         return this;
                     }

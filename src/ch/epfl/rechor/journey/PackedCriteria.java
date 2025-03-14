@@ -2,6 +2,7 @@ package ch.epfl.rechor.journey;
 
 import ch.epfl.rechor.Preconditions;
 import com.sun.jdi.PrimitiveValue;
+import jdk.dynalink.NamedOperation;
 
 import static java.lang.Integer.toUnsignedLong;
 /**
@@ -15,7 +16,11 @@ public class PackedCriteria {
     private final static int MAX_BIT_DEPART = 51;
     private final static int MAX_BIT_ARR = 39;
     private final static int MAX_HOURS_POSSIBLE = 4095;
-
+    private final static long NO_DEPART = 0x1FFFFFFFFFFFFL;
+    private final static int CHANGES_SIZE = 7;
+    private final static int CHANGES_POSITION = 127;
+    private final static long ADD_CHANGES = 1L;
+    private final static long NO_PAYLOAD = ~(0xFFFFFFFFL);
 
     private PackedCriteria(){}
 
@@ -32,7 +37,7 @@ public class PackedCriteria {
      */
     public static long pack(int arrMins, int changes, int payload){
         Preconditions.checkArgument(arrMins >= MINIMUM_HOURS && arrMins < MAXIMUM_HOURS);
-        Preconditions.checkArgument(changes >> 7 == 0);
+        Preconditions.checkArgument(changes >> CHANGES_SIZE == 0);
         return toUnsignedLong(arrMins- MINIMUM_HOURS) << MAX_BIT_ARR | toUnsignedLong(changes) <<  MAX_BIT_CHANGE | toUnsignedLong(payload);
     }
 
@@ -81,7 +86,7 @@ public class PackedCriteria {
      */
     public static int changes(long criteria)
     {
-        return (int) (criteria >>  MAX_BIT_CHANGE & 127);
+        return (int) (criteria >>  MAX_BIT_CHANGE & CHANGES_POSITION);
     }
 
     /**
@@ -123,7 +128,7 @@ public class PackedCriteria {
      * @return les nouveaux critères empaquetés sans heure de départ
      */
     public static long withoutDepMins(long criteria){
-        return criteria & 0x1FFFFFFFFFFFFL;
+        return criteria & NO_DEPART;
     }
 
     /**
@@ -151,7 +156,7 @@ public class PackedCriteria {
      */
     public static long withAdditionalChange(long criteria)
     {
-        return criteria + (1L <<  MAX_BIT_CHANGE);
+        return criteria + (ADD_CHANGES <<  MAX_BIT_CHANGE);
     }
 
     /**
@@ -164,6 +169,6 @@ public class PackedCriteria {
      * @return les critères empaquetés avec une nouvelle «charge utile»
      */
     public static long withPayload(long criteria, int payload1){
-        return (criteria & ~(0xFFFFFFFFL)) | toUnsignedLong(payload1);
+        return (criteria & NO_PAYLOAD) | toUnsignedLong(payload1);
     }
 }

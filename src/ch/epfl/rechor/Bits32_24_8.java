@@ -1,12 +1,15 @@
 package ch.epfl.rechor;
 
+import com.sun.jdi.PrimitiveValue;
+
 /**
  * La classe permet de manipuler une paire de valeur de 24 et 8 bits
  * respectivement empaquetées dans un entier de 32 bits de type int.
  */
 public class Bits32_24_8 {
-    private static final int BITS_8 = 8;
-    private static final int BITS_24 = 24;
+    private static final int LESS_BITS = 8;
+    private static final int GREATEST_BITS = 24;
+    private static final int LESS_BITS_POSITION = 255;
 
 
     private Bits32_24_8(){}
@@ -21,8 +24,8 @@ public class Bits32_24_8 {
      * @return le vecteur de 32 bits
      */
     public static int pack(int bits24, int bits8){
-        Preconditions.checkArgument(bits24 >> BITS_24==0 && bits8 >> BITS_8==0);
-        return (bits24 << BITS_8) | bits8;
+        Preconditions.checkArgument(bits24 >> GREATEST_BITS==0 && bits8 >> LESS_BITS==0);
+        return (bits24 << LESS_BITS) | bits8;
     }
 
     /**
@@ -32,7 +35,7 @@ public class Bits32_24_8 {
      * @return les 24 bits de poids fort
      */
     public static int unpack24(int bits32){
-        return bits32 >>> BITS_8;
+        return bits32 >>> LESS_BITS;
     }
 
     /**
@@ -42,7 +45,7 @@ public class Bits32_24_8 {
      * @return les 8 bits de poids faible
      */
     public static int unpack8(int bits32){
-        return bits32 & 255;
+        return bits32 & LESS_BITS_POSITION;
     }
 
 }
