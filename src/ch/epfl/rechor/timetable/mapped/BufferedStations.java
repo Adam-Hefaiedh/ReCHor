@@ -8,14 +8,25 @@ import java.util.List;
 import static ch.epfl.rechor.timetable.mapped.Structure.field;
 import static java.lang.Math.scalb;
 
+/**
+ * La classe permet d'accéder à une table de gares représentée de manière aplatie
+ */
 public final class BufferedStations implements Stations {
 
-    private StructuredBuffer structuredBuffer;
-    private List<String> stringTable;
-    public final static int NAME_ID = 0;
-    public final static int LON = 1;
-    public final static int LAT = 2;
+    private final StructuredBuffer structuredBuffer;
+    private final List<String> stringTable;
+    private final static int NAME_ID = 0;
+    private final static int LON = 1;
+    private final static int LAT = 2;
+    private final static double CONVERSION = scalb(360,-32);
 
+    /**
+     * Construit une instance donnant accès aux données aplaties
+     * @param stringTable
+     * Chaine de caractere contenant les donnees du tableau
+     * @param buffer
+     * Tableau de byte contenant les index des donnees du tableau
+     */
     public BufferedStations(List<String> stringTable, ByteBuffer buffer){
         Structure structure = new Structure(field(NAME_ID, Structure.FieldType.U16),
                 field(LON, Structure.FieldType.S32),
@@ -24,23 +35,45 @@ public final class BufferedStations implements Stations {
        this.stringTable = stringTable;
     }
 
+    /**
+     * Retourne le nom de la gare correspondant à l'index donné.
+     * @param id
+     * l'index de la gare
+     * @return le nom de la gare correspondant à l'index donné.
+     */
     @Override
     public String name(int id) {
-        return stringTable.get(structuredBuffer.getU16(id, NAME_ID));
+        return stringTable.get(structuredBuffer.getU16(NAME_ID,id));
     }
 
+    /**
+     * Retourne la longitude, en degrés, de la gare correspondant à l'index donné.
+     * @param id
+     * l'index de la gare
+     * @return la longitude de la gare.
+     */
     @Override
     public double longitude(int id) {
-        int longitude = Integer.getInteger(stringTable.get(structuredBuffer.getS32(id, LON)));
-        return scalb(longitude*360,-32);
+        int longitude = structuredBuffer.getS32(LON,id);
+        return longitude*CONVERSION;
     }
 
+    /**
+     * Retourne la latitude, en degrés, de la gare correspondant à l'index donné.
+     * @param id
+     * l'index de la gare
+     * @return la latitude de la gare.
+     */
     @Override
     public double latitude(int id) {
-        int latitude = Integer.getInteger(stringTable.get(structuredBuffer.getS32(id, LAT)));
-        return scalb(latitude*360,-32);
+        int latitude = structuredBuffer.getS32(LAT,id);
+        return latitude*CONVERSION;
     }
 
+    /**
+     * Retourne la taille de tableau de donnee lier au station
+     * @return la taille de tableau de donnee lier au station
+     */
     @Override
     public int size() {
         return structuredBuffer.size();
