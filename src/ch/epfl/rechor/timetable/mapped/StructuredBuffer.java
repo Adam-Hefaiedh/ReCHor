@@ -1,6 +1,7 @@
 package ch.epfl.rechor.timetable.mapped;
 
 import ch.epfl.rechor.Preconditions;
+import ch.epfl.rechor.timetable.Indexed;
 
 import java.nio.ByteBuffer;
 
