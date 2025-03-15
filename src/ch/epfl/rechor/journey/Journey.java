@@ -24,6 +24,7 @@ public record Journey(List<Leg> legs) {
      * @param legs
      * les étapes du voyage.
      *
+     * @throws IllegalArgumentException si un parametre n'est pas valide
      */
     public Journey{
         Preconditions.checkArgument(!legs.isEmpty());
@@ -138,6 +139,9 @@ public record Journey(List<Leg> legs) {
              * la date/heure d'arrivée à l'arrêt,
              * @param depTime
              * la date/heure de départ de l'arrêt.
+             *
+             * @throws NullPointerException si Stop est null
+             * @throws IllegalArgumentException si le temps d'arriver est avant le temps de depart
              */
             public IntermediateStop{
                 Objects.requireNonNull(stop);
@@ -184,6 +188,8 @@ public record Journey(List<Leg> legs) {
              * le nom de la ligne sur laquelle circule le véhicule utilisé pour cette étape
              * @param destination
              * le nom de la destination finale du véhicule utilisé pour cette étape
+             * @throws NullPointerException si une des valeurs est null
+             * @throws IllegalArgumentException si le temps d'arriver est apres le temps de depart
              */
             public Transport{
                 Objects.requireNonNull(depstop);
@@ -237,6 +243,8 @@ public record Journey(List<Leg> legs) {
              * l'arrêt d'arrivée de l'étape
              * @param arrTime
              * la date/heure d'arrivée de l'étape
+             * @throws IllegalArgumentException si l'heure de depart est apres l'heure d'arriver
+             * @throws NullPointerException si les arrets sont null
              */
             public Foot{
                 Objects.requireNonNull(depStop);

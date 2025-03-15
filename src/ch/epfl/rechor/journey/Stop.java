@@ -44,6 +44,8 @@ public record Stop(String name, String platformName, double longitude, double la
      * @param latitude
      * la latitude de la position de l'arrêt, en degrés,
      *
+     * @throws NullPointerException si name est null
+     * @throws IllegalArgumentException si longitude et latitude ne sont pas valide
      */
     public Stop{
         Objects.requireNonNull(name);

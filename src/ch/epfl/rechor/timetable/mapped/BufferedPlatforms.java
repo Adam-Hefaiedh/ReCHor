@@ -36,6 +36,7 @@ public final class BufferedPlatforms implements Platforms {
      * @param id
      * l'index de la voie ou du quai
      * @return le nom de la voie/quai
+     * @throws IndexOutOfBoundsException si l'index est invalide
      */
     @Override
     public String name(int id) {
@@ -47,6 +48,7 @@ public final class BufferedPlatforms implements Platforms {
      * @param id
      * l'index de la voie ou du quai
      * @return l'index de la station lier a la platform
+     * @throws IndexOutOfBoundsException si l'index est invalide
      */
     @Override
     public int stationId(int id) {

@@ -35,6 +35,7 @@ public final class BufferedStationAliases implements StationAliases {
      * @param id
      * l'index du nom alternatif
      * @return le nom alternatif de la gare pour l'index donné.
+     * @throws IndexOutOfBoundsException si l'index id est invalide
      */
     @Override
     public String alias(int id) {
@@ -46,6 +47,7 @@ public final class BufferedStationAliases implements StationAliases {
      * @param id
      * l'index du nom alternatif
      * @return le nom officiel de la gare correspondant à l'alias d'index donné.
+     * @throws IndexOutOfBoundsException si l'index id est invalide
      */
     @Override
     public String stationName(int id) {

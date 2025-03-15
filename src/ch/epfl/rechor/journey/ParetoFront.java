@@ -39,6 +39,8 @@ public class ParetoFront {
      * @param changes
      * Le nombre de changements du critères a trouver
      * @return le critères contenant cette heure d'arrivée et ce nombre de changement
+     *
+     * @throws NoSuchElementException si les criteres en parametre ne sont pas dans le tableau
      */
     public long get(int arrMins, int changes)
     {

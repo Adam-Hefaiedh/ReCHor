@@ -27,9 +27,18 @@ public class Structure {
      * L'index du champ dans la structure
      * @param type
      * Le type du champ
+     *
      */
     public record Field(int index, FieldType type) {
-
+        /**
+         * Verifie si le type est null ou pas
+         * @param index
+         * index du champ dans le tableau
+         * @param type
+         * type du champ
+         *
+         * @throws NullPointerException si le type du champ est null
+         */
         public Field{
             Objects.requireNonNull(type);
         }
@@ -51,6 +60,7 @@ public class Structure {
      * Retourne une structure dont les champs sont ceux donnés
      * @param fields
      * liste des champs donner
+     * @throws IllegalArgumentException si les index de fields ne sont pas dans l'ordre
      */
     public Structure(Field... fields){
         int pos = 0;
@@ -85,6 +95,8 @@ public class Structure {
      * @param elementIndex
      * L'index d'element desirer
      * @return l'index de la donner desirer dans le tableau
+     *
+     * @throws IndexOutOfBoundsException si l'index de champ est invalide
      */
     public int offset(int fieldIndex, int elementIndex){
         return elementIndex * totalSize + fieldPosition[fieldIndex];

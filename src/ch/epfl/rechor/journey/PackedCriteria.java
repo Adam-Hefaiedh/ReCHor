@@ -34,6 +34,7 @@ public class PackedCriteria {
      * @param payload
      * La «charge utile»
      * @return valeur de type long empaquetant les 3 valeurs
+     * @throws IllegalArgumentException si arrMins n'est pas compris entre -240(inclus) et 2880(exclus) ou si changes n'est pas de la bonne taille
      */
     public static long pack(int arrMins, int changes, int payload){
         Preconditions.checkArgument(arrMins >= MINIMUM_HOURS && arrMins < MAXIMUM_HOURS);
@@ -58,6 +59,7 @@ public class PackedCriteria {
      * @param criteria
      * Les critères empaqueté
      * @return l'heure de départ
+     * @throws IllegalArgumentException si la valeur long ne contient pas de depmins
      */
     public static int depMins(long criteria){
         Preconditions.checkArgument(hasDepMins(criteria));
@@ -108,6 +110,7 @@ public class PackedCriteria {
      * @param criteria2
      * Les seconds critères empaquetés
      * @return vrai si les premiers critères empaquetés dominent ou sont égaux aux seconds
+     * @throws IllegalArgumentException si un critères empaquetés possede un depmins alors que l'autre non
      */
     public static boolean dominatesOrIsEqual(long criteria1, long criteria2){
         Preconditions.checkArgument(hasDepMins(criteria1) == hasDepMins(criteria2));
@@ -139,6 +142,7 @@ public class PackedCriteria {
      * @param depMins1
      * La nouvelle heure de départ
      * @return les critères empaquetés avec une nouvelle heure de départ
+     * @throws IllegalArgumentException si depMins n'est pas compris entre -240(inclus) et 2880(exclus)
      */
     public static long withDepMins(long criteria, int depMins1)
     {

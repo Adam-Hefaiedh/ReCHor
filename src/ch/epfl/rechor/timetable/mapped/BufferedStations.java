@@ -40,6 +40,7 @@ public final class BufferedStations implements Stations {
      * @param id
      * l'index de la gare
      * @return le nom de la gare correspondant à l'index donné.
+     * @throws IndexOutOfBoundsException si l'index id est invalide
      */
     @Override
     public String name(int id) {
@@ -51,6 +52,7 @@ public final class BufferedStations implements Stations {
      * @param id
      * l'index de la gare
      * @return la longitude de la gare.
+     * @throws IndexOutOfBoundsException si l'index id est invalide
      */
     @Override
     public double longitude(int id) {
@@ -63,6 +65,7 @@ public final class BufferedStations implements Stations {
      * @param id
      * l'index de la gare
      * @return la latitude de la gare.
+     * @throws IndexOutOfBoundsException si l'index id est invalide
      */
     @Override
     public double latitude(int id) {

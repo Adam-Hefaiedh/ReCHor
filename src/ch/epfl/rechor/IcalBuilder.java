@@ -116,6 +116,7 @@ public final class IcalBuilder {
      * puis le retire de la liste des composants ouverts et ajoute la ligne de fin correspondante.
      *
      * @return l'instance courante de IcalBuilder pour permettre l'enchaînement des appels
+     * @throws IllegalArgumentException Si il n'y a pas de composante qui ont commencer
      */
     public IcalBuilder end(){
         Preconditions.checkArgument(!startingComponents.isEmpty());
@@ -131,6 +132,7 @@ public final class IcalBuilder {
      * Concatène les lignes générées en les séparant par un retour chariot suivi d'un saut de ligne ("\r\n").
      *
      * @return la chaîne de caractères finale correspondant à l'iCalendar construit
+     * @throws IllegalArgumentException si il reste des composant qui n'ont pas fini
      */
     public String build(){
         Preconditions.checkArgument(startingComponents.isEmpty());

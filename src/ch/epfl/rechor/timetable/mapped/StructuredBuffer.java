@@ -21,6 +21,7 @@ public class StructuredBuffer {
      * La structure d'element donnée
      * @param buffer
      * Où les octets sont stockés
+     * @throws IllegalArgumentException si la capaciter du buffer n'est pas divisble par la taille de la structure
      */
     public StructuredBuffer(Structure structure, ByteBuffer buffer){
        this.structure = structure;
@@ -45,6 +46,8 @@ public class StructuredBuffer {
      * @param elementIndex
      * L'index de l'element desirer
      * @return l'entier U8 correspondant au deux index
+     *
+     * @throws IndexOutOfBoundsException si les index sont invalides
      */
     public int getU8(int fieldIndex, int elementIndex){
         int offset = structure.offset(fieldIndex, elementIndex);
@@ -60,6 +63,8 @@ public class StructuredBuffer {
      * @param elementIndex
      * L'index de l'element desirer
      * @return l'entier U16 correspondant au deux index
+     *
+     * @throws IndexOutOfBoundsException si les index sont invalides
      */
     public int getU16(int fieldIndex, int elementIndex){
         int offset = structure.offset(fieldIndex, elementIndex);
@@ -75,6 +80,8 @@ public class StructuredBuffer {
      * @param elementIndex
      * L'index de l'element desirer
      * @return l'entier S32 correspondant au deux index
+     *
+     * @throws IndexOutOfBoundsException si les index sont invalides
      */
     public int getS32(int fieldIndex, int elementIndex){
         int offset = structure.offset(fieldIndex, elementIndex);

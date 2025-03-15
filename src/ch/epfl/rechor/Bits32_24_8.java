@@ -22,6 +22,7 @@ public class Bits32_24_8 {
      * @param bits8
      * Les 8 bits de poids faible
      * @return le vecteur de 32 bits
+     * @throws IllegalArgumentException si bits24 et bits8 ne sont pas de la bonne taille
      */
     public static int pack(int bits24, int bits8){
         Preconditions.checkArgument(bits24 >> GREATEST_BITS==0 && bits8 >> LESS_BITS==0);
