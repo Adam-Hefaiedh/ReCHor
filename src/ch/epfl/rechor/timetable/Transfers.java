@@ -44,7 +44,7 @@ public interface Transfers extends Indexed {
      * @param arrStationId l'index de la gare d'arrivée
      * @return la durée du transfert en minutes entre la gare de départ et la gare d'arrivée
      * @throws IndexOutOfBoundsException si l'un des index est invalide
-     r* @throws NoSuchElementException si aucun transfert n'est possible entre les deux gaes
+     r* @throws NoSuchElementException si aucun transfert n'est possible entre les deux gares
      */
     abstract int minutesBetween(int depStationId, int arrStationId);
 

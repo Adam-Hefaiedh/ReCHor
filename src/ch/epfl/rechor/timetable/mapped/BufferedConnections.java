@@ -19,9 +19,12 @@ public final class BufferedConnections implements Connections {
     private final static int TRIP_POS_ID = 4;
 
     public BufferedConnections(ByteBuffer buffer, ByteBuffer succBuffer){
-        Structure structure = new Structure(field(DEP_STOP_ID, Structure.FieldType.U16),
-                field(DEP_MINUTES, Structure.FieldType.U16),field(ARR_STOP_ID, Structure.FieldType.U16),
-                field(ARR_MINUTES, Structure.FieldType.U16),field(TRIP_POS_ID, Structure.FieldType.S32));
+        Structure structure = new Structure(
+                field(DEP_STOP_ID, Structure.FieldType.U16),
+                field(DEP_MINUTES, Structure.FieldType.U16),
+                field(ARR_STOP_ID, Structure.FieldType.U16),
+                field(ARR_MINUTES, Structure.FieldType.U16),
+                field(TRIP_POS_ID, Structure.FieldType.S32));
         structuredBuffer = new StructuredBuffer(structure, buffer);
         this.buffer = succBuffer.asIntBuffer();
     }
@@ -48,12 +51,12 @@ public final class BufferedConnections implements Connections {
 
     @Override
     public int tripId(int id) {
-        return unpack24(structuredBuffer.getU16(DEP_MINUTES,id));
+        return unpack24(structuredBuffer.getS32(TRIP_POS_ID,id));
     }
 
     @Override
     public int tripPos(int id) {
-        return unpack8(structuredBuffer.getU16(DEP_MINUTES,id));
+        return unpack8(structuredBuffer.getS32(TRIP_POS_ID,id));
     }
 
     @Override

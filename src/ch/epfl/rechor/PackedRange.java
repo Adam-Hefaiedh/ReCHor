@@ -15,6 +15,7 @@ public class PackedRange {
      * @param endExclusive
      * Valeur maximale de l'intervalle exclu
      * @return la valeur de type int représentant l'intervalle d'entiers
+     * @throws IllegalArgumentException si length et startInclusive ne sont pas de la bonne taille
      */
     public static int pack(int startInclusive, int endExclusive)
     {
