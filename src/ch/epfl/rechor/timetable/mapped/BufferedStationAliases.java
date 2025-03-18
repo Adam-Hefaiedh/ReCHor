@@ -3,6 +3,7 @@ package ch.epfl.rechor.timetable.mapped;
 import ch.epfl.rechor.timetable.StationAliases;
 
 import java.nio.ByteBuffer;
+import java.sql.SQLOutput;
 import java.util.List;
 
 import static ch.epfl.rechor.timetable.mapped.Structure.field;

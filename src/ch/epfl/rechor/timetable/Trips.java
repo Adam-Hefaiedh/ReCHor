@@ -13,7 +13,7 @@ public interface Trips extends Indexed {
      * @return l'index de la ligne associée à la course
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract int routeId(int id);
+    int routeId(int id);
 
     /**
      * Retourne le nom de la destination finale de la course d'index donné.
@@ -22,5 +22,5 @@ public interface Trips extends Indexed {
      * @return le nom de la destination finale de la course
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract String destination(int id);
+    String destination(int id);
 }
