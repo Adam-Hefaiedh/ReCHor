@@ -51,12 +51,12 @@ public final class BufferedConnections implements Connections {
 
     @Override
     public int tripId(int id) {
-        return unpack24(structuredBuffer.getU16(DEP_MINUTES,id));
+        return unpack24(structuredBuffer.getS32(TRIP_POS_ID,id));
     }
 
     @Override
     public int tripPos(int id) {
-        return unpack8(structuredBuffer.getU16(DEP_MINUTES,id));
+        return unpack8(structuredBuffer.getS32(TRIP_POS_ID,id));
     }
 
     @Override
