@@ -1,27 +1,29 @@
 package ch.epfl.rechor.timetable;
 
+import java.util.NoSuchElementException;
+
 /**
  * L'interface Transfers représente les changements indexés dans un horaire de transport public.
- * Elle permet d'obtenir des informations sur les transferts entre gares, comme l'index de la gare de départ,
- * la durée du transfert, et les correspondances vers les gares d'arrivée.
+ * Elle permet d'obtenir des informations sur les changements entre gares, comme l'index de la gare de départ,
+ * la durée du changement, et les correspondances vers les gares d'arrivée.
  * Les méthodes de cette interface lèvent une IndexOutOfBoundsException en cas d'index invalide.
  */
 public interface Transfers extends Indexed {
 
     /**
-     * Retourne l'index de la gare de départ du transfert pour le changement d'index donné.
+     * Retourne l'index de la gare de départ du changement pour le changement d'index donné.
      *
      * @param id l'index du changement
-     * @return l'index de la gare de départ associée à ce transfert
+     * @return l'index de la gare de départ associée à ce changement
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
     abstract int depStationId(int id);
 
     /**
-     * Retourne la durée, en minutes, du transfert pour le changement d'index donné.
+     * Retourne la durée, en minutes, du changement pour le changement d'index donné.
      *
      * @param id l'index du changement
-     * @return la durée du transfert en minutes
+     * @return la durée du changement en minutes
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
     abstract int minutes(int id);
@@ -37,14 +39,14 @@ public interface Transfers extends Indexed {
     abstract int arrivingAt(int stationId);
 
     /**
-     * Retourne la durée, en minutes, du transfert entre les deux gares identifiées par les index donnés.
-     * Si aucun transfert n'est possible entre ces deux gares, la méthode lève une NoSuchElementException.
+     * Retourne la durée, en minutes, du changement entre les deux gares identifiées par les index donnés.
+     * Si aucun changement n'est possible entre ces deux gares, la méthode lève une NoSuchElementException.
      *
      * @param depStationId l'index de la gare de départ
      * @param arrStationId l'index de la gare d'arrivée
-     * @return la durée du transfert en minutes entre la gare de départ et la gare d'arrivée
+     * @return la durée du changement en minutes entre la gare de départ et la gare d'arrivée
      * @throws IndexOutOfBoundsException si l'un des index est invalide
-     r* @throws NoSuchElementException si aucun transfert n'est possible entre les deux gares
+     * @throws NoSuchElementException si aucun changement n'est possible entre les deux gares
      */
     abstract int minutesBetween(int depStationId, int arrStationId);
 
