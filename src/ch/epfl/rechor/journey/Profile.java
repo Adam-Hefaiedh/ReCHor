@@ -1,11 +1,8 @@
 package ch.epfl.rechor.journey;
 
 import ch.epfl.rechor.timetable.Connections;
-import ch.epfl.rechor.timetable.Stations;
 import ch.epfl.rechor.timetable.TimeTable;
 import ch.epfl.rechor.timetable.Trips;
-import ch.epfl.rechor.timetable.mapped.BufferedStations;
-import ch.epfl.rechor.timetable.mapped.FileTimeTable;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -30,7 +30,7 @@ public final class BufferedTransfers implements Transfers {
                 field(TRANSFER_MINUTES, Structure.FieldType.U8));
         structuredBuffer = new StructuredBuffer(structure, buffer);
         int capacity = 0;
-        for(int i=0; i<structuredBuffer.size(); i++){
+        for(int i=0; i<size(); i++){
             if(structuredBuffer.getU16(ARR_STATION_ID,i)> capacity){
                 capacity = structuredBuffer.getU16(ARR_STATION_ID,i);
             }
@@ -38,14 +38,14 @@ public final class BufferedTransfers implements Transfers {
         arrStations = new int[capacity+1];
         int FirstStation=0;
         int arrStation_id_init =  0;
-        for(int i=0; i<structuredBuffer.size(); i++){
+        for(int i=0; i<size(); i++){
            if (arrStation_id_init != structuredBuffer.getU16(ARR_STATION_ID,i)) {
                 arrStations[arrStation_id_init] = PackedRange.pack(FirstStation,i);
                 FirstStation = i;
                 arrStation_id_init = structuredBuffer.getU16(ARR_STATION_ID,i);
             }
         }
-        arrStations[arrStation_id_init] = PackedRange.pack(FirstStation,structuredBuffer.size());
+        arrStations[arrStation_id_init] = PackedRange.pack(FirstStation,size());
     }
 
     /**
