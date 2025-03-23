@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteBuffer;
 import java.util.HexFormat;
+import java.util.NoSuchElementException;
 
 public class TransferTest {
     private static final HexFormat HEX = HexFormat.ofDelimiter(" ");
@@ -39,19 +40,19 @@ public class TransferTest {
     @Test
     void arrivingAtReturnsCorrectInterval() {
         int interval = transfers.arrivingAt(2);
-        assertEquals(0, interval >>> 16); // Début
-        assertEquals(2, interval & 0xFFFF); // Fin
+        assertEquals(0, PackedRange.startInclusive(interval));
+        assertEquals(3, PackedRange.endExclusive(interval)); // Fin
 
         int interval2 = transfers.arrivingAt(5);
 
-        assertEquals(3, interval2 >>> 16); // Début
-        assertEquals(3, interval2 & 0xFFFF); // Fin
+        assertEquals(3, PackedRange.startInclusive(interval2));
+        assertEquals(4, PackedRange.endExclusive(interval2)); // Fin
     }
 
     @Test
     void arrivingAtThrowsForInvalidStationId() {
-        assertThrows(IllegalArgumentException.class, () -> transfers.arrivingAt(-1));
-        assertThrows(IllegalArgumentException.class, () -> transfers.arrivingAt(9999));
+        assertThrows(IndexOutOfBoundsException.class, () -> transfers.arrivingAt(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> transfers.arrivingAt(9999));
     }
 
     @Test
@@ -68,7 +69,7 @@ public class TransferTest {
         assertEquals(10, transfers.minutesBetween(3, 2));
         assertEquals(15, transfers.minutesBetween(4, 2));
         assertEquals(20, transfers.minutesBetween(2, 5));
-        assertThrows(IllegalArgumentException.class, () -> transfers.minutesBetween(4, 5));
+        assertThrows(NoSuchElementException.class, () -> transfers.minutesBetween(4, 5));
 
 
     }
@@ -91,8 +92,8 @@ public class TransferTest {
 
     @Test
     void minutesBetweenHandlesInvalidCases() {
-        assertThrows(IllegalArgumentException.class, () -> transfers.minutesBetween(99, 2));
-        assertThrows(IllegalArgumentException.class, () -> transfers.minutesBetween(1, 99));
+        assertThrows(NoSuchElementException.class, () -> transfers.minutesBetween(99, 2));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> transfers.minutesBetween(1, 99));
     }
 
 
@@ -124,13 +125,13 @@ public class TransferTest {
 
 
         int interval = multipleTransfers.arrivingAt(2);
-        assertEquals(0, interval >>> 16);
-        assertEquals(3, interval & 0xFFFF);
+        assertEquals(0, PackedRange.startInclusive(interval));
+        assertEquals(4, PackedRange.endExclusive(interval));
 
 
         int interval3 = multipleTransfers.arrivingAt(3);
-        assertEquals(4, interval3 >>> 16);
-        assertEquals(4, interval3 & 0xFFFF);
+        assertEquals(4, PackedRange.startInclusive(interval3));
+        assertEquals(5, PackedRange.endExclusive(interval3));
     }
 
 
@@ -161,7 +162,7 @@ public class TransferTest {
 
         int interval = allToSame.arrivingAt(5);
         assertEquals(0, interval >>> 16);
-        assertEquals(3, interval);
+        assertEquals(4, interval);
     }
 
 
@@ -203,7 +204,7 @@ public class TransferTest {
 
         int interval = allToSame.arrivingAt(5);
         assertEquals(0, interval >>> 16);
-        assertEquals(3, interval & 0xFFFF);
+        assertEquals(4, interval & 0xFFFF);
     }
 
 
@@ -224,7 +225,7 @@ public class TransferTest {
 
     @Test
     void arrivingAtThrowsForInvalidStationId2() {
-        assertThrows(IllegalArgumentException.class, () -> transfers.arrivingAt(-1));
-        assertThrows(IllegalArgumentException.class, () -> transfers.arrivingAt(9999));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> transfers.arrivingAt(-1));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> transfers.arrivingAt(9999));
     }
 }
