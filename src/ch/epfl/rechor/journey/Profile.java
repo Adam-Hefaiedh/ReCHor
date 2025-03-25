@@ -29,8 +29,8 @@ public record Profile (TimeTable timeTable, LocalDate date, int arrStationId, Li
         private final TimeTable timeTable;
         private final LocalDate date;
         private final int arrStationId;
-        private ParetoFront.Builder[] stationFrontiers;
-        private ParetoFront.Builder[] tripFrontiers;
+        private final ParetoFront.Builder[] stationFrontiers;
+        private final ParetoFront.Builder[] tripFrontiers;
 
         public Builder(TimeTable timeTable, LocalDate date, int arrStationId){
             this.timeTable = timeTable;
