@@ -1,6 +1,7 @@
 package ch.epfl.rechor.timetable.mapped;
 
 import ch.epfl.rechor.PackedRange;
+import ch.epfl.rechor.journey.PackedCriteria;
 import ch.epfl.rechor.timetable.Transfers;
 
 import java.nio.ByteBuffer;

@@ -5,6 +5,8 @@ import ch.epfl.rechor.timetable.TimeTable;
 import ch.epfl.rechor.timetable.Trips;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public record Profile (TimeTable timeTable, LocalDate date, int arrStationId, List<ParetoFront> stationFront) {
@@ -17,7 +19,7 @@ public record Profile (TimeTable timeTable, LocalDate date, int arrStationId, Li
         return timeTable.connectionsFor(date);
     }
 
-    Trips trips(){
+    public Trips trips(){
         return timeTable.tripsFor(date);
     }
 
@@ -29,8 +31,8 @@ public record Profile (TimeTable timeTable, LocalDate date, int arrStationId, Li
         private final TimeTable timeTable;
         private final LocalDate date;
         private final int arrStationId;
-        private ParetoFront.Builder[] stationFrontiers;
-        private ParetoFront.Builder[] tripFrontiers;
+        private final ParetoFront.Builder[] stationFrontiers;
+        private final ParetoFront.Builder[] tripFrontiers;
 
         public Builder(TimeTable timeTable, LocalDate date, int arrStationId){
             this.timeTable = timeTable;
@@ -59,8 +61,12 @@ public record Profile (TimeTable timeTable, LocalDate date, int arrStationId, Li
        public void setForTrip(int tripId, ParetoFront.Builder builder){
            tripFrontiers[tripId] = builder;
        }
-        Profile build(){
-            return new Profile(timeTable,date,arrStationId,stationFrontiers);
+        public Profile build(){
+            List<ParetoFront> stationFront = new ArrayList<>();
+            for(ParetoFront.Builder builder : stationFrontiers){
+                if(builder != null) stationFront.add(builder.build());
+            }
+            return new Profile(timeTable,date,arrStationId, stationFront);
         }
     }
 
