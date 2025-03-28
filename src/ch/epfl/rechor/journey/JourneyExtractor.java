@@ -3,11 +3,13 @@ package ch.epfl.rechor.journey;
 import ch.epfl.rechor.Bits32_24_8;
 import ch.epfl.rechor.timetable.*;
 
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Stack;
 
 public class JourneyExtractor {
 
@@ -15,13 +17,10 @@ public class JourneyExtractor {
 
     public static List<Journey> journeys(Profile profile, int depStationId){
         ParetoFront pf = profile.forStation(depStationId);
-        List<Journey> journeys = new ArrayList<Journey>();
+        List<Journey> journeys = new ArrayList<>();
         pf.forEach((long criteria) -> {
-            List<Journey.Leg> legs = new ArrayList<Journey.Leg>();
-            int ConnectionID = Bits32_24_8.unpack24(PackedCriteria.payload(criteria));
-            System.out.println(ConnectionID);
-            createFoot(profile,depStationId,ConnectionID,legs);
-            createTransport(criteria,profile,ConnectionID,legs);
+            List<Journey.Leg> legs = new ArrayList<>();
+            createJourney(criteria,depStationId,profile,legs);
             journeys.add(new Journey(legs));
         });
         journeys.sort(Comparator
@@ -30,79 +29,96 @@ public class JourneyExtractor {
         return journeys;
     }
 
-    private static void createTransport(long criteria, Profile profile, int ConnectionID, List<Journey.Leg> legs){
+    private static void createJourney(long criteria, int depStationId, Profile profile, List<Journey.Leg> legs){
+        Connections connections = profile.connections();
+        int intermediateChanges = Bits32_24_8.unpack8(PackedCriteria.payload(criteria));
+        int ConnectionID = Bits32_24_8.unpack24(PackedCriteria.payload(criteria));
+        int arrStationid;
+        long newCriteria;
+        if(depStationId != connections.depStopId(ConnectionID)){
+
+            createFoot(profile,depStationId,connections.depStopId(ConnectionID),
+                    PackedCriteria.depMins(criteria), legs);
+        }
+        for(int i=1; i<PackedCriteria.changes(criteria)+2; i++){
+            ConnectionID = createTransport(profile, ConnectionID, legs, intermediateChanges);
+            arrStationid = connections.arrStopId(ConnectionID);
+            if(i<= PackedCriteria.changes(criteria)) {
+                newCriteria =
+                        profile.forStation(convertToStation(profile.timeTable(), arrStationid))
+                                .get(PackedCriteria.arrMins(criteria),PackedCriteria.changes(criteria) - i);
+                int arrHours = connections.arrMins(ConnectionID);
+                ConnectionID = Bits32_24_8.unpack24(PackedCriteria.payload(newCriteria));
+                intermediateChanges = Bits32_24_8.unpack8(PackedCriteria.payload(newCriteria));
+                createFoot(profile, arrStationid,connections.depStopId(ConnectionID), arrHours,legs);
+            }
+            else if(convertToStation(profile.timeTable(), connections.arrStopId(ConnectionID)) != profile.arrStationId()){
+                createFoot(profile, arrStationid, profile.arrStationId(), connections.arrMins(ConnectionID),legs);
+            }
+        }
+    }
+    private static int createTransport(Profile profile, int ConnectionID, List<Journey.Leg> legs, int intermediateChanges)
+    {
         Stations stations = profile.timeTable().stations();
-        StationAliases aliases = profile.timeTable().stationAliases();
         Connections connections = profile.connections();
         Trips trips = profile.trips();
         Routes routes = profile.timeTable().routes();
-        int arrStationid = connections.arrStopId(ConnectionID);
-        for(int i=0; i<PackedCriteria.changes(criteria); i++){
-            List<Journey.Leg.IntermediateStop> intermediateStops = new ArrayList<>();
-            Stop depStop = createStop(stations, aliases, profile.timeTable(), connections.depStopId(ConnectionID));
-            Stop arrStop = createStop(stations, aliases,  profile.timeTable(), connections.arrStopId(ConnectionID));
-            LocalDateTime depTime1 = timeToDate(profile, connections.depMins(ConnectionID));
-            LocalDateTime depTime = timeToDate(profile, connections.arrMins(ConnectionID));
+        List<Journey.Leg.IntermediateStop> intermediateStops = new ArrayList<>();
+        Stop depStop = createStop(stations, profile.timeTable(), connections.depStopId(ConnectionID));
+        Stop arrStop = createStop(stations, profile.timeTable(), connections.arrStopId(ConnectionID));
+        LocalDateTime beginDepTime = formatDate(profile, connections.depMins(ConnectionID));
+        LocalDateTime depTime = formatDate(profile, connections.arrMins(ConnectionID));
+        LocalDateTime arrTime;
+        for(int j=0; j< intermediateChanges; j++){
             ConnectionID = connections.nextConnectionId(ConnectionID);
-            LocalDateTime arrTime = timeToDate(profile,connections.depMins(ConnectionID));
-            for(int j=0; j< Bits32_24_8.unpack8(PackedCriteria.payload(criteria)); j++){
-                intermediateStops.add(new Journey.Leg.IntermediateStop(arrStop,depTime,arrTime));
-                arrStationid = connections.arrStopId(ConnectionID);
-                depTime = timeToDate(profile,connections.arrMins(ConnectionID));
-                arrStop = createStop(stations, aliases,  profile.timeTable(), connections.arrStopId(ConnectionID));
-                ConnectionID = connections.nextConnectionId(ConnectionID);
-                arrTime = timeToDate(profile,connections.depMins(ConnectionID));
-            }
-            arrTime = depTime;
-            depTime = depTime1;
-            Journey.Leg.Transport transport = new Journey.Leg.Transport(depStop, depTime, arrStop, arrTime,
-                    intermediateStops,routes.vehicle(trips.routeId(connections.tripId(ConnectionID))),
-                    routes.name(trips.routeId(connections.tripId(ConnectionID))),
-                    trips.destination(connections.tripId(ConnectionID)));
-            legs.add(transport);
-            ConnectionID = Bits32_24_8.unpack24(PackedCriteria.payload(
-                        profile.forStation(profile.timeTable().stationId(connections.arrStopId(ConnectionID)))
-                                .get(PackedCriteria.arrMins(criteria),PackedCriteria.changes(criteria) - i - 1)));
-            ConnectionID = connections.nextConnectionId(ConnectionID);
-            createFoot(profile,arrStationid, ConnectionID,legs);
+            arrTime = formatDate(profile,connections.depMins(ConnectionID));
+            intermediateStops.add(new Journey.Leg.IntermediateStop(arrStop,depTime,arrTime));
+            depTime = formatDate(profile,connections.arrMins(ConnectionID));
+            arrStop = createStop(stations,profile.timeTable(), connections.arrStopId(ConnectionID));
         }
+        arrTime = depTime;
+        depTime = beginDepTime;
+        Journey.Leg.Transport transport = new Journey.Leg.Transport(depStop, depTime, arrStop, arrTime,
+                intermediateStops,routes.vehicle(trips.routeId(connections.tripId(ConnectionID))),
+                routes.name(trips.routeId(connections.tripId(ConnectionID))),
+                trips.destination(connections.tripId(ConnectionID)));
+        legs.add(transport);
+        return ConnectionID;
     }
 
-    private static void createFoot(Profile profile, int depStationId, int ConnectionID, List<Journey.Leg> legs){
-        Stations stations = profile.timeTable().stations();
-        StationAliases aliases = profile.timeTable().stationAliases();
-        Connections connections = profile.connections();
-        Transfers transfers = profile.timeTable().transfers();
-        for(int i= 0; i<connections.size(); i++)
-        {
-//            if(stations.name(connections.depStopId(ConnectionID))){
-//
-//            }
-        }
-        System.out.println(stations.name(connections.depStopId(ConnectionID)));
-        System.out.println(stations.name(depStationId));
-        if(connections.depStopId(ConnectionID) != depStationId){
-            Stop depStop = createStop(stations, aliases,  profile.timeTable(), depStationId);
-            Stop arrStop =createStop(stations, aliases,  profile.timeTable(), connections.depStopId(ConnectionID));
-            LocalDateTime arrTime = timeToDate(profile, connections.depMins(ConnectionID));
-            LocalDateTime depTime = timeToDate(profile, connections.depMins(ConnectionID)
-            - transfers.minutesBetween(depStationId, connections.depStopId(ConnectionID)));
+    private static void createFoot(Profile profile, int depStationId, int arrStationID, int depHour, List<Journey.Leg> legs){
+        TimeTable timeTable = profile.timeTable();
+        Stations stations = timeTable.stations();
+        Transfers transfers = timeTable.transfers();
+        int station = convertToStation(timeTable, arrStationID);
+        int station2 = convertToStation(timeTable, depStationId);
+            Stop depStop = createStop(stations,  profile.timeTable(), depStationId);
+            Stop arrStop =createStop(stations,  profile.timeTable(), arrStationID);
+            LocalDateTime arrTime = formatDate(profile,depHour
+                    + transfers.minutesBetween(station2, station));
+            LocalDateTime depTime = formatDate(profile, depHour);
             Journey.Leg.Foot foot = new Journey.Leg.Foot(depStop,depTime,arrStop,arrTime);
             legs.add(foot);
-        }
 
     }
 
-    private static LocalDateTime timeToDate(Profile profile, int time){
+    private static LocalDateTime formatDate(Profile profile, int time){
         return  LocalDateTime.of(profile.date(),
                 LocalTime.of(time/60,
                         time%60));
     }
-    private static Stop createStop(Stations stations,StationAliases aliases, TimeTable timeTable, int stopId){
+
+    private static int convertToStation(TimeTable timeTable, int stopId)
+    {
+        return timeTable.isPlatformId(stopId) ? timeTable.platforms().stationId(timeTable.stationId(stopId)) : stopId;
+    }
+
+    private static Stop createStop(Stations stations, TimeTable timeTable, int stopId){
+        int station = convertToStation(timeTable, stopId);
        return new Stop(
-                stations.name(timeTable.stationId(stopId)),
+                stations.name(station),
                 timeTable.platformName(stopId),
-                stations.longitude(timeTable.stationId(stopId)),
-                stations.latitude(timeTable.stationId(stopId)));
+                stations.longitude(station),
+                stations.latitude(station));
     }
 }

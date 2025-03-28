@@ -99,8 +99,8 @@ public final class BufferedTransfers implements Transfers {
     public int minutesBetween(int depStationId, int arrStationId) {
         int interval = arrivingAt(arrStationId);
         for(int i=PackedRange.startInclusive(interval);i<PackedRange.endExclusive(interval);i++){
-            if(structuredBuffer.getU16(DEP_STATION_ID,i) == depStationId)
-                return structuredBuffer.getU8(TRANSFER_MINUTES,i);
+            if(structuredBuffer.getU16(DEP_STATION_ID,i) == depStationId){
+                return structuredBuffer.getU8(TRANSFER_MINUTES,i);}
         }
         throw new NoSuchElementException();
     }

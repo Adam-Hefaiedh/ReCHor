@@ -32,7 +32,7 @@ public record Journey(List<Leg> legs) {
         {
             Preconditions.checkArgument(!legs.get(i-1).getClass().equals(legs.get(i).getClass()));
             Preconditions.checkArgument(legs.get(i).depTime().isEqual(legs.get(i-1).arrTime())||legs.get(i).depTime().isAfter(legs.get(i-1).arrTime()));
-            Preconditions.checkArgument(legs.get(i).depStop().name().equals(legs.get(i-1).arrStop().name()));
+            Preconditions.checkArgument(legs.get(i).depStop().equals(legs.get(i-1).arrStop()));
         }
         legs = List.copyOf(legs);
     }
@@ -197,8 +197,6 @@ public record Journey(List<Leg> legs) {
                 Objects.requireNonNull(vehicle);
                 Objects.requireNonNull(route);
                 Objects.requireNonNull(destination);
-                Objects.requireNonNull(arrTime);
-                Objects.requireNonNull(depTime);
                 Preconditions.checkArgument(!depTime.isAfter(arrTime));
                 intermediateStops = List.copyOf(intermediateStops);
             }

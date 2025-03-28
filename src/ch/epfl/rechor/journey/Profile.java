@@ -1,5 +1,6 @@
 package ch.epfl.rechor.journey;
 
+import ch.epfl.rechor.Bits32_24_8;
 import ch.epfl.rechor.timetable.Connections;
 import ch.epfl.rechor.timetable.TimeTable;
 import ch.epfl.rechor.timetable.Trips;
@@ -61,10 +62,12 @@ public record Profile (TimeTable timeTable, LocalDate date, int arrStationId, Li
        public void setForTrip(int tripId, ParetoFront.Builder builder){
            tripFrontiers[tripId] = builder;
        }
-        public Profile build(){
+
+       public Profile build(){
             List<ParetoFront> stationFront = new ArrayList<>();
             for(ParetoFront.Builder builder : stationFrontiers){
                 if(builder != null) stationFront.add(builder.build());
+                else stationFront.add(ParetoFront.EMPTY);
             }
             return new Profile(timeTable,date,arrStationId, stationFront);
         }

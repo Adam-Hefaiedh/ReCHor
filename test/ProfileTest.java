@@ -17,8 +17,11 @@ public class ProfileTest {
         LocalDate date = LocalDate.of(2025, Month.MARCH, 18);
         Profile p = readProfile(t, date, 11486);
         List<Journey> js = JourneyExtractor.journeys(p, 7872);
-        String j = JourneyIcalConverter.toIcalendar(js.get(32));
-        System.out.println(j);
+        for(Journey i : js) {
+            String j = JourneyIcalConverter.toIcalendar(i);
+            System.out.println(j);
+        }
+
     }
     public static Profile readProfile(TimeTable timeTable,
                         LocalDate date,

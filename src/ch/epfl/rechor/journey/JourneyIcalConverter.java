@@ -54,9 +54,6 @@ public class JourneyIcalConverter {
                 .end();
 
 
-        String icalData = builder.build();
-
-
-        return icalData;
+        return builder.build();
     }
 }
