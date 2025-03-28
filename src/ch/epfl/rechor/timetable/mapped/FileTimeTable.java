@@ -23,7 +23,8 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
 
     public static TimeTable in(Path directory) throws IOException {
 
-        List<String> stringTable = copyOf(Files.readAllLines(directory.resolve("strings.txt"), StandardCharsets.ISO_8859_1));
+        List<String> stringTable = copyOf(Files.readAllLines(directory.resolve("strings.txt"),
+                StandardCharsets.ISO_8859_1));
         Stations stations = new BufferedStations(stringTable,
                 extractData("stations.bin",directory));
         StationAliases stationAliases = new BufferedStationAliases(stringTable,
@@ -84,8 +85,10 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     @Override
     public Connections connectionsFor(LocalDate date) {
         try {
-            return new BufferedConnections(extractData(date.toString() + "\\connections.bin", directory),
-                    extractData(date.toString() + "\\connections-succ.bin", directory));
+            return new BufferedConnections(extractData(date.toString() + "\\connections.bin",
+                    directory),
+                    extractData(date.toString() + "\\connections-succ.bin",
+                            directory));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
