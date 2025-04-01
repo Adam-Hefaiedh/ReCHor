@@ -3,7 +3,6 @@ package ch.epfl.rechor.timetable.mapped;
 import ch.epfl.rechor.timetable.StationAliases;
 
 import java.nio.ByteBuffer;
-import java.sql.SQLOutput;
 import java.util.List;
 
 import static ch.epfl.rechor.timetable.mapped.Structure.field;
@@ -56,8 +55,8 @@ public final class BufferedStationAliases implements StationAliases {
     }
 
     /**
-     * Retourne la taille de tableau de donnee lier au alias de station
-     * @return la taille de tableau de donnee lier au alias de station
+     * Retourne la taille de tableau de donnee lier à l'alias de station
+     * @return la taille de tableau de donnee lier à l'alias de station
      */
     @Override
     public int size() {

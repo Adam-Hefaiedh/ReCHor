@@ -15,7 +15,7 @@ import java.time.temporal.ChronoField;
  */
 public final class FormatterFr {
     /**
-     * retourne la représentation textuelle de la durée donnée
+     * Retourne la représentation textuelle de la durée donnée
      * @param duration
      * durée a representer
      * @return la représentation textuelle de la durée donnée
@@ -28,9 +28,9 @@ public final class FormatterFr {
     }
 
     /**
-     * retourne la représentation textuelle de l'heure de la date/heure donnée
+     * Retourne la représentation textuelle de l'heure de la date/heure donnée
      * @param dateTime
-     * date/heure a representer
+     * date/heure à representer
      * @return la représentation textuelle de l'heure de la date/heure donnée
      */
     public static String formatTime(LocalDateTime dateTime) {
@@ -42,8 +42,8 @@ public final class FormatterFr {
         return fmt.format(dateTime);
     }
     /**
-     * retourne la représentation textuelle de la voie ou quai de l'arrêt
-     * ou retourne une liste vide si il n'y a pas de nom de platform.
+     * Retourne la représentation textuelle de la voie ou quai de l'arrêt
+     * ou retourne une liste vide s'il n'y a pas de nom de platform.
      * @param stop
      * arret contenant le nom de la plateforme a representer
      * @return la représentation textuelle de la platform
@@ -57,7 +57,7 @@ public final class FormatterFr {
                 : "voie "+ stop.platformName();
     }
     /**
-     * retourne la représentation textuelle de l'étape à pied donnée
+     * Retourne la représentation textuelle de l'étape à pied donnée
      * @param footLeg
      * etape a pied a representer
      * @return la représentation textuelle de l'étape à pied donnée
@@ -69,10 +69,10 @@ public final class FormatterFr {
         return String.valueOf(sb);
     }
     /**
-     * retourne la représentation textuelle de l'étape en transport donnée
+     * Retourne la représentation textuelle de l'étape en transport donnée
      * @param leg
-     * l'étape en transport  a representer
-     * @return la représentation textuelle de l'étape en transport  donnée
+     * l'étape en transport a representer
+     * @return la représentation textuelle de l'étape en transport donnée
      */
     public static String formatLeg(Journey.Leg.Transport leg) {
         StringBuilder sb = new StringBuilder();
@@ -86,10 +86,10 @@ public final class FormatterFr {
         return String.valueOf(sb);
     }
     /**
-     * retourne la représentation textuelle de la ligne et du sens
+     * Retourne la représentation textuelle de la ligne et du sens
      * de parcours du véhicule emprunté pour effectuer l'étape donnée.
      * @param transportLeg
-     * la ligne et le sens de parcours du véhicule emprunté  a representer
+     * la ligne et le sens de parcours du véhicule emprunté à representer
      * @return la représentation textuelle de la ligne et le sens de parcours du véhicule emprunté pour l'étape
      */
     public static String formatRouteDestination(Journey.Leg.Transport transportLeg) {

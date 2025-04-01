@@ -28,7 +28,7 @@ public record Stop(String name, String platformName, double longitude, double la
     private final static int MIN_LATITUDE = -90;
 
     /**
-     * constructeur verifiant si le nom de l'arret n'est pas null et que
+     * Constructeur verifiant si le nom de l'arret n'est pas null et que
      * la longitude soit entre -180 et 180 (inclus) et la latitude entre
      * -90 et 90 (inclus)
      *

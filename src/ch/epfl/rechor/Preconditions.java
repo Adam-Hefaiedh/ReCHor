@@ -7,7 +7,7 @@ public final class Preconditions {
     private Preconditions() {}
 
     /**
-     *Verifie si la condition est valider sinon envoie une erreur.
+     *Verifie si la condition est validé sinon envoie une erreur.
      *
      * @param shouldBeTrue
      * La condition a verifier.

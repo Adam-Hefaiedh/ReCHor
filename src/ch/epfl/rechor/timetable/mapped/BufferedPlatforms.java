@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static ch.epfl.rechor.timetable.mapped.Structure.field;
-import static java.lang.Integer.parseInt;
 
 /**
  * La classe permet d'accéder à une table de voies ou quais représentée de manière aplatie
@@ -44,7 +43,7 @@ public final class BufferedPlatforms implements Platforms {
     }
 
     /**
-     * Retourne l'index de la station lier a la platform
+     * Retourne l'index de la station lier à la platform
      * @param id
      * l'index de la voie ou du quai
      * @return l'index de la station lier a la platform
@@ -56,8 +55,8 @@ public final class BufferedPlatforms implements Platforms {
     }
 
     /**
-     * Retourne la taille des donnees lier a platform
-     * @return la taille des donnees lier a platform
+     * Retourne la taille des donnees lier à platform
+     * @return la taille des donnees lier à platform
      */
     @Override
     public int size() {

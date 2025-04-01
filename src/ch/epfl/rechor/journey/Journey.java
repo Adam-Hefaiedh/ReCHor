@@ -31,7 +31,7 @@ public record Journey(List<Leg> legs) {
         for(int i=1; i<legs.size(); i++)
         {
             Preconditions.checkArgument(!legs.get(i-1).getClass().equals(legs.get(i).getClass()));
-            Preconditions.checkArgument(legs.get(i).depTime().isEqual(legs.get(i-1).arrTime())||legs.get(i).depTime().isAfter(legs.get(i-1).arrTime()));
+            Preconditions.checkArgument(!legs.get(i).depTime().isBefore(legs.get(i-1).arrTime()));
             Preconditions.checkArgument(legs.get(i).depStop().equals(legs.get(i-1).arrStop()));
         }
         legs = List.copyOf(legs);
@@ -89,7 +89,7 @@ public record Journey(List<Leg> legs) {
          */
         abstract Stop depStop();
         /**
-         * retourne l'arrêt d'arrivée de l'étape.
+         * Retourne l'arrêt d'arrivée de l'étape.
          * @return l'arrêt d'arrivée de l'étape
          */
         abstract Stop arrStop();
@@ -100,19 +100,19 @@ public record Journey(List<Leg> legs) {
         abstract LocalDateTime depTime();
 
         /**
-         * retourne la date/heure d'arrivée de l'étape
+         * Retourne la date/heure d'arrivée de l'étape
          * @return la date/heure d'arrivée de l'étape
          */
         abstract LocalDateTime arrTime();
 
         /**
-         * retourne la liste des arrêts intermédiaires de l'étape
+         * Retourne la liste des arrêts intermédiaires de l'étape
          * @return la liste des arrêts intermédiaires de l'étape
          */
         abstract List<IntermediateStop> intermediateStops();
 
         /**
-         * retourne la durée de l'étape.
+         * Retourne la durée de l'étape.
          * @return la durée de l'étape
          */
         default Duration duration(){
@@ -132,7 +132,7 @@ public record Journey(List<Leg> legs) {
         public record IntermediateStop(Stop stop, LocalDateTime arrTime, LocalDateTime depTime){
             /**
              * Le constructeur verifie que stop n'est pas null et
-             * la date/heure de départ n'est pas antérieure à celle d'arrivée
+             * la date/heure de départ n'est pas antérieure à celle d'arrivée.
              * @param stop
              * l'arrêt intermédiaire en question
              * @param arrTime
@@ -170,7 +170,7 @@ public record Journey(List<Leg> legs) {
          */
         public record Transport(Stop depstop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime, List<IntermediateStop> intermediateStops, Vehicle vehicle, String route, String destination) implements Leg{
             /**
-             * Le constructeur verifie que aucun argument est null et
+             * Le constructeur verifie qu'aucun argument n'est null et
              * que la date/heure d'arrivée n'est pas antérieure à celle de départ.
              * @param depstop
              * l'arrêt de départ de l'étape
@@ -210,7 +210,7 @@ public record Journey(List<Leg> legs) {
             }
 
             /**
-             * retourne la liste des arrêts intermédiaires de l'étape
+             * Retourne la liste des arrêts intermédiaires de l'étape
              * @return la liste des arrêts intermédiaires de l'étape
              */
             public List<IntermediateStop> intermediateStops(){
@@ -231,7 +231,7 @@ public record Journey(List<Leg> legs) {
          */
         public record Foot(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime) implements Leg{
             /**
-             * Le constructeur verifie que aucun argument est null et
+             * Le constructeur verifie qu'aucun argument n'est null et
              * que la date/heure d'arrivée n'est pas antérieure à celle de départ.
              * @param depStop
              * l'arrêt de départ de l'étape
@@ -251,15 +251,15 @@ public record Journey(List<Leg> legs) {
             }
 
             /**
-             * qui implémente la méthode abstraite correspondante de l'interface Leg
-             * @return une liste vide car il n'y a pas  d'arrêts intermédiaires
+             * Qui implémente la méthode abstraite correspondante de l'interface Leg
+             * @return une liste vide, car il n'y a pas d'arrêts intermédiaires
              */
             public List<IntermediateStop> intermediateStops(){
                 return List.of();
             }
 
             /**
-             * retourne vrai ssi l'étape est un changement au sein de la même gare
+             * Retourne vrai ssi l'étape est un changement au sein de la même gare
              * @return vrai si si le nom de l'arrêt de départ est identique à celui de l'arrêt d'arrivée
              */
             public boolean isTransfer(){

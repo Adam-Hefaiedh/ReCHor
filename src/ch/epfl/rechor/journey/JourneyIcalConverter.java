@@ -3,7 +3,6 @@ package ch.epfl.rechor.journey;
 import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.IcalBuilder;
 
-import java.rmi.server.UID;
 import java.util.StringJoiner;
 import java.util.UUID;
 

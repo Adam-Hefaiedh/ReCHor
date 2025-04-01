@@ -1,11 +1,9 @@
 package ch.epfl.rechor.timetable.mapped;
 
 import ch.epfl.rechor.PackedRange;
-import ch.epfl.rechor.journey.PackedCriteria;
 import ch.epfl.rechor.timetable.Transfers;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import static ch.epfl.rechor.timetable.mapped.Structure.field;

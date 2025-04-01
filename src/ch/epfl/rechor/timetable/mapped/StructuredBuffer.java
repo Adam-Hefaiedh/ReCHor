@@ -1,12 +1,11 @@
 package ch.epfl.rechor.timetable.mapped;
 
 import ch.epfl.rechor.Preconditions;
-import ch.epfl.rechor.timetable.Indexed;
 
 import java.nio.ByteBuffer;
 
 /**
- * La classe représente un «tableau d'octets structuré»
+ * La classe représente un « tableau d'octets structuré ».
  */
 public class StructuredBuffer {
 
@@ -15,12 +14,12 @@ public class StructuredBuffer {
     private final int size;
 
     /**
-     * construit un tableau structuré dont les éléments ont la structure donnée,
-     * et dont les octets sont stockés dans le «tableau» buffer
+     * Construit un tableau structuré dont les éléments ont la structure donnée,
+     * et dont les octets sont stockés dans le « tableau » buffer
      * @param structure
      * La structure d'element donnée
      * @param buffer
-     * Où les octets sont stockés
+     * Où les octets sont stockés.
      * @throws IllegalArgumentException si la capaciter du buffer n'est pas divisble par la taille de la structure
      */
     public StructuredBuffer(Structure structure, ByteBuffer buffer){

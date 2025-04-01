@@ -4,7 +4,6 @@ import ch.epfl.rechor.timetable.Connections;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.List;
 
 import static ch.epfl.rechor.Bits32_24_8.*;
 import static ch.epfl.rechor.timetable.mapped.Structure.field;
@@ -101,7 +100,7 @@ public final class BufferedConnections implements Connections {
 
     /**
      * Retourne la position de la liaison d'index donné dans la course à laquelle elle appartient.
-     * La première liaison d'une course a l'index 0.
+     * La première liaison d'une course à l'index 0.
      *
      * @param id l'index de la liaison
      * @return la position de la liaison dans la course

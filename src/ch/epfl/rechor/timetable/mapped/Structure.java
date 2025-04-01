@@ -18,7 +18,7 @@ public class Structure {
     public enum FieldType{
         U8,
         U16,
-        S32;
+        S32
     }
 
     /**
@@ -45,7 +45,7 @@ public class Structure {
     }
 
     /**
-     * retourne une instance de Field avec les attributs donnés
+     * Retourne une instance de Field avec les attributs donnés
      * @param index
      * L'index du champ dans la structure
      * @param type
@@ -88,7 +88,7 @@ public class Structure {
     }
 
     /**
-     *  retourne l'index, dans le tableau d'octets contenant les données aplaties,
+     *  Retourne l'index, dans le tableau d'octets contenant les données aplaties,
      *  du premier octet du champ d'index fieldIndex de l'élément d'index elementIndex
      * @param fieldIndex
      * L'index du champ desirer

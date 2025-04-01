@@ -17,7 +17,7 @@ public final class IcalBuilder {
      */
     public enum Component {
         VCALENDAR, // Composant calendrier principal
-        VEVENT;    // Composant événement
+        VEVENT    // Composant événement
     }
 
     /**
@@ -33,7 +33,7 @@ public final class IcalBuilder {
         DTSTART,     // Date et heure de début de l'événement
         DTEND,       // Date et heure de fin de l'événement
         SUMMARY,     // Résumé ou titre de l'événement
-        DESCRIPTION; // Description détaillée de l'événement
+        DESCRIPTION // Description détaillée de l'événement
     }
 
     // Instance de StringBuilder
@@ -100,7 +100,7 @@ public final class IcalBuilder {
     /**
      * Commence un nouveau composant dans l'iCalendar.
      *
-     * @param component le composant à démarrer (par exemple VCALENDAR ou VEVENT)
+     * @param component le composant a démarré (par exemple VCALENDAR ou VEVENT).
      * @return l'instance courante de IcalBuilder pour permettre l'enchaînement des appels
      */
     public IcalBuilder begin(Component component){
@@ -129,10 +129,10 @@ public final class IcalBuilder {
      * Construit la chaîne de caractères finale représentant le contenu complet de l'iCalendar.
      *
      * Vérifie que tous les composants ouverts ont été correctement fermés.
-     * Concatène les lignes générées en les séparant par un retour chariot suivi d'un saut de ligne ("\r\n").
+     * Concatène les lignes générées en les séparant par un retour chariot suivi d'un saut de ligne ('\r\n').
      *
      * @return la chaîne de caractères finale correspondant à l'iCalendar construit
-     * @throws IllegalArgumentException si il reste des composant qui n'ont pas fini
+     * @throws IllegalArgumentException s'il reste des composants qui n'ont pas fini
      */
     public String build(){
         Preconditions.checkArgument(startingComponents.isEmpty());

@@ -74,8 +74,8 @@ public final class BufferedStations implements Stations {
     }
 
     /**
-     * Retourne la taille de tableau de donnee lier au station
-     * @return la taille de tableau de donnee lier au station
+     * Retourne la taille de tableau de donnee lier à la station
+     * @return la taille de tableau de donnee lier à la station
      */
     @Override
     public int size() {
