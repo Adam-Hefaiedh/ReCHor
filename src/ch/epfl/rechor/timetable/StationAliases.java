@@ -14,7 +14,7 @@ public interface StationAliases extends Indexed {
      * @return le nom alternatif de la gare
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract String alias(int id);
+    String alias(int id);
 
     /**
      * Retourne le nom officiel de la gare correspondant à l'alias d'index donné.
@@ -24,5 +24,5 @@ public interface StationAliases extends Indexed {
      * @return le nom officiel de la gare associée à l'alias
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract String stationName(int id);
+    String stationName(int id);
 }

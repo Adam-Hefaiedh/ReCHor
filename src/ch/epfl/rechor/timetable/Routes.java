@@ -15,7 +15,7 @@ public interface Routes extends Indexed {
      * @return le véhicule associé à la ligne
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract Vehicle vehicle(int id);
+    Vehicle vehicle(int id);
 
     /**
      * Retourne le nom de la ligne d'index donné, par exemple "IR 15".
@@ -24,5 +24,5 @@ public interface Routes extends Indexed {
      * @return le nom de la ligne
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract String name(int id);
+    String name(int id);
 }

@@ -13,7 +13,7 @@ public interface Connections extends Indexed {
      * @return l'index de l'arrêt de départ
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int depStopId(int id);
+    int depStopId(int id);
 
     /**
      * Retourne l'heure de départ de la liaison d'index donné, exprimée en minutes après minuit.
@@ -22,7 +22,7 @@ public interface Connections extends Indexed {
      * @return l'heure de départ en minutes après minuit
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int depMins(int id);
+    int depMins(int id);
 
     /**
      * Retourne l'index de l'arrêt d'arrivée de la liaison d'index donné.
@@ -31,7 +31,7 @@ public interface Connections extends Indexed {
      * @return l'index de l'arrêt d'arrivée
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int arrStopId(int id);
+    int arrStopId(int id);
 
     /**
      * Retourne l'heure d'arrivée de la liaison d'index donné, exprimée en minutes après minuit.
@@ -40,7 +40,7 @@ public interface Connections extends Indexed {
      * @return l'heure d'arrivée en minutes après minuit
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int arrMins(int id);
+    int arrMins(int id);
 
     /**
      * Retourne l'index de la course à laquelle appartient la liaison d'index donné.
@@ -49,7 +49,7 @@ public interface Connections extends Indexed {
      * @return l'index de la course associée
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int tripId(int id);
+    int tripId(int id);
 
     /**
      * Retourne la position de la liaison d'index donné dans la course à laquelle elle appartient.
@@ -59,7 +59,7 @@ public interface Connections extends Indexed {
      * @return la position de la liaison dans la course
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int tripPos(int id);
+    int tripPos(int id);
 
     /**
      * Retourne l'index de la liaison suivant celle d'index donné dans la course à laquelle elle appartient.
@@ -69,5 +69,5 @@ public interface Connections extends Indexed {
      * @return l'index de la liaison suivante ou, si la liaison est la dernière, l'index de la première liaison de la course
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int nextConnectionId(int id);
+    int nextConnectionId(int id);
 }

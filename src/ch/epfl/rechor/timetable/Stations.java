@@ -13,7 +13,7 @@ public interface Stations extends Indexed {
      * @return le nom de la gare
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract String name(int id);
+    String name(int id);
 
     /**
      * Retourne la longitude, en degrés, de la gare correspondant à l'index donné.
@@ -22,7 +22,7 @@ public interface Stations extends Indexed {
      * @return la longitude de la gare en degrés
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract double longitude(int id);
+    double longitude(int id);
 
     /**
      * Retourne la latitude, en degrés, de la gare correspondant à l'index donné.
@@ -31,5 +31,5 @@ public interface Stations extends Indexed {
      * @return la latitude de la gare en degrés
      * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract double latitude(int id);
+    double latitude(int id);
 }
