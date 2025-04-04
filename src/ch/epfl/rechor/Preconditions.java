@@ -7,7 +7,8 @@ package ch.epfl.rechor;
  * @author El Hassan Lyoussi (398924).
  */
 public final class Preconditions {
-    private Preconditions() {}
+    private Preconditions() {
+    }
 
     /**
      * Vérifie si la condition est validé sinon envoie une erreur.

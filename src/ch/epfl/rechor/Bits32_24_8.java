@@ -26,6 +26,7 @@ public class Bits32_24_8 {
      */
     public static int pack(int bits24, int bits8){
         Preconditions.checkArgument(bits24 >> GREATEST_BITS==0 && bits8 >> LESS_BITS==0);
+
         return (bits24 << LESS_BITS) | bits8;
     }
 

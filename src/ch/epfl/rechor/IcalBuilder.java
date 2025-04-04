@@ -124,6 +124,7 @@ public final class IcalBuilder {
         Preconditions.checkArgument(!startingComponents.isEmpty());
         Component lastComponentOpened = startingComponents.removeLast();
         add(Name.END,lastComponentOpened.toString());
+
         return this;
     }
 
@@ -137,6 +138,7 @@ public final class IcalBuilder {
      */
     public String build(){
         Preconditions.checkArgument(startingComponents.isEmpty());
+
         return builder.toString();
     }
 }

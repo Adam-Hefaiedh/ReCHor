@@ -38,6 +38,7 @@ public class PackedCriteria {
     public static long pack(int arrMins, int changes, int payload){
         Preconditions.checkArgument(arrMins >= MINIMUM_HOURS && arrMins < MAXIMUM_HOURS);
         Preconditions.checkArgument(changes >> CHANGES_POSITION == 0);
+
         return toUnsignedLong(arrMins- MINIMUM_HOURS) << MAX_BIT_ARR |
                 toUnsignedLong(changes) <<  MAX_BIT_CHANGE | toUnsignedLong(payload);
     }
@@ -61,6 +62,7 @@ public class PackedCriteria {
      */
     public static int depMins(long criteria){
         Preconditions.checkArgument(hasDepMins(criteria));
+
         return MAX_HOURS_POSSIBLE - (int)(criteria >>>  MAX_BIT_DEPART) + MINIMUM_HOURS;
     }
 
@@ -105,6 +107,7 @@ public class PackedCriteria {
      */
     public static boolean dominatesOrIsEqual(long criteria1, long criteria2){
         Preconditions.checkArgument(hasDepMins(criteria1) == hasDepMins(criteria2));
+
         if(hasDepMins(criteria1))
         {
            return depMins(criteria1) >= depMins(criteria2) && arrMins(criteria1) <=
@@ -135,6 +138,7 @@ public class PackedCriteria {
     {
         Preconditions.checkArgument(depMins1 >= MINIMUM_HOURS && depMins1 < MAXIMUM_HOURS);
         int depMins2 = MAX_HOURS_POSSIBLE - depMins1 + MINIMUM_HOURS;
+
         return (withoutDepMins(criteria)) | (long)(depMins2) <<  MAX_BIT_DEPART;
     }
 

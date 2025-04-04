@@ -62,7 +62,9 @@ public class Structure {
         fieldPosition = new int[fields.length];
         int size = 0;
         for (int i = 0; i < fields.length; i++){
+
             Preconditions.checkArgument(fields[i].index() == i );
+
             fieldPosition[i] = pos;
             switch (fields[i].type()){
                 case U8 -> size = 1;
