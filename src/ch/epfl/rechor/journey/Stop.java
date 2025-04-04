@@ -7,19 +7,13 @@ import java.util.Objects;
 
 /**
  * Class representant les arrêts de transport public.
+ * @param name Le nom de l'arrêt, ou le nom de la gare à laquelle appartient l'arrêt.
+ * @param platformName le nom de la voie ou du quai de l'arrêt, ou null si l'arrêt correspond à une gare.
+ * @param longitude la longitude de la position de l'arrêt, en degrés.
+ * @param latitude la latitude de la position de l'arrêt, en degrés.
  *
- * @param name
- * Le nom de l'arrêt, ou le nom de la gare à laquelle appartient l'arrêt.
- *
- * @param platformName
- * le nom de la voie ou du quai de l'arrêt, ou null si l'arrêt correspond à une gare,
- *
- * @param longitude
- * la longitude de la position de l'arrêt, en degrés,
- *
- * @param latitude
- * la latitude de la position de l'arrêt, en degrés,
- *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
  */
 public record Stop(String name, String platformName, double longitude, double latitude) {
     private final static int MAX_LONGITUDE = 180;
@@ -30,22 +24,14 @@ public record Stop(String name, String platformName, double longitude, double la
     /**
      * Constructeur verifiant si le nom de l'arret n'est pas null et que
      * la longitude soit entre -180 et 180 (inclus) et la latitude entre
-     * -90 et 90 (inclus)
+     * -90 et 90 (inclus).
+     * @param name Le nom de l'arrêt, ou le nom de la gare à laquelle appartient l'arrêt.
+     * @param platformName le nom de la voie ou du quai de l'arrêt, ou null si l'arrêt correspond à une gare.
+     * @param longitude la longitude de la position de l'arrêt, en degrés.
+     * @param latitude la latitude de la position de l'arrêt, en degrés.
      *
-     * @param name
-     * Le nom de l'arrêt, ou le nom de la gare à laquelle appartient l'arrêt.
-     *
-     * @param platformName
-     * le nom de la voie ou du quai de l'arrêt, ou null si l'arrêt correspond à une gare,
-     *
-     * @param longitude
-     * la longitude de la position de l'arrêt, en degrés,
-     *
-     * @param latitude
-     * la latitude de la position de l'arrêt, en degrés,
-     *
-     * @throws NullPointerException si name est null
-     * @throws IllegalArgumentException si longitude et latitude ne sont pas valide
+     * @throws NullPointerException si name est null.
+     * @throws IllegalArgumentException si longitude et latitude ne sont pas valide.
      */
     public Stop{
         Objects.requireNonNull(name);

@@ -9,7 +9,10 @@ import static ch.epfl.rechor.timetable.mapped.Structure.field;
 import static java.lang.Math.scalb;
 
 /**
- * La classe permet d'accéder à une table de gares représentée de manière aplatie
+ * La classe permet d'accéder à une table de gares représentée de manière aplatie.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
  */
 public final class BufferedStations implements Stations {
 
@@ -21,11 +24,9 @@ public final class BufferedStations implements Stations {
     private final static double CONVERSION = scalb(360,-32);
 
     /**
-     * Construit une instance donnant accès aux données aplaties
-     * @param stringTable
-     * Chaine de caractere contenant les donnees du tableau
-     * @param buffer
-     * Tableau de byte contenant les index des donnees du tableau
+     * Construit une instance donnant accès aux données aplaties.
+     * @param stringTable Chaine de caractere contenant les donnees du tableau.
+     * @param buffer Tableau de byte contenant les index des donnees du tableau.
      */
     public BufferedStations(List<String> stringTable, ByteBuffer buffer){
         Structure structure = new Structure(field(NAME_ID, Structure.FieldType.U16),
@@ -37,10 +38,9 @@ public final class BufferedStations implements Stations {
 
     /**
      * Retourne le nom de la gare correspondant à l'index donné.
-     * @param id
-     * l'index de la gare
+     * @param id l'index de la gare.
      * @return le nom de la gare correspondant à l'index donné.
-     * @throws IndexOutOfBoundsException si l'index id est invalide
+     * @throws IndexOutOfBoundsException si l'index id est invalide.
      */
     @Override
     public String name(int id) {
@@ -49,10 +49,9 @@ public final class BufferedStations implements Stations {
 
     /**
      * Retourne la longitude, en degrés, de la gare correspondant à l'index donné.
-     * @param id
-     * l'index de la gare
+     * @param id l'index de la gare.
      * @return la longitude de la gare.
-     * @throws IndexOutOfBoundsException si l'index id est invalide
+     * @throws IndexOutOfBoundsException si l'index id est invalide.
      */
     @Override
     public double longitude(int id) {
@@ -62,10 +61,9 @@ public final class BufferedStations implements Stations {
 
     /**
      * Retourne la latitude, en degrés, de la gare correspondant à l'index donné.
-     * @param id
-     * l'index de la gare
+     * @param id l'index de la gare.
      * @return la latitude de la gare.
-     * @throws IndexOutOfBoundsException si l'index id est invalide
+     * @throws IndexOutOfBoundsException si l'index id est invalide.
      */
     @Override
     public double latitude(int id) {
@@ -74,8 +72,8 @@ public final class BufferedStations implements Stations {
     }
 
     /**
-     * Retourne la taille de tableau de donnee lier à la station
-     * @return la taille de tableau de donnee lier à la station
+     * Retourne la taille de tableau de donnee lier à la station.
+     * @return la taille de tableau de donnee lier à la station.
      */
     @Override
     public int size() {

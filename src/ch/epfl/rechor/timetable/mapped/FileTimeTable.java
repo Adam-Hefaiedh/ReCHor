@@ -16,31 +16,25 @@ import static java.util.List.copyOf;
 
 /**
  * La classe représente un horaire de transport public dont les données (aplaties) sont stockées dans des fichiers.
- * @param directory
- * Le chemin d'accès au dossier contenant les fichiers des données horaires
- * @param stringTable
- * La table des chaînes de caractères
- * @param stations
- * Les gares
- * @param stationAliases
- * Les noms alternatifs des gares
- * @param platforms
- * Les voies/quai
- * @param routes
- * Les lignes
- * @param transfers
- * Les changements
+ * @param directory Le chemin d'accès au dossier contenant les fichiers des données horaires.
+ * @param stringTable La table des chaînes de caractères.
+ * @param stations Les gares.
+ * @param stationAliases Les noms alternatifs des gares.
+ * @param platforms Les voies/quai.
+ * @param routes Les lignes.
+ * @param transfers Les changements.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
  */
 public record FileTimeTable(Path directory, List<String> stringTable, Stations stations, StationAliases stationAliases, Platforms platforms, Routes routes, Transfers transfers) implements TimeTable {
 
     /**
      * Methode facilitant la création d'une instance à partir du
-     * chemin d'accès au dossier contenant les données horaires
-     * @param directory
-     * Le chemin d'accès au dossier contenant les fichiers des données horaires
-     * @return L'instance de la classe FileTimeTable du chemin d'accès au dossier contenant les données horaires
-     * @throws IOException
-     * Si le dossier est introuvable
+     * chemin d'accès au dossier contenant les données horaires.
+     * @param directory Le chemin d'accès au dossier contenant les fichiers des données horaires.
+     * @return L'instance de la classe FileTimeTable du chemin d'accès au dossier contenant les données horaires.
+     * @throws IOException Si le dossier est introuvable.
      */
     public static TimeTable in(Path directory) throws IOException {
 
@@ -69,7 +63,7 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     /**
      * Retourne les gares indexées de l'horaire.
      *
-     * @return l'ensemble des gares
+     * @return l'ensemble des gares.
      */
     @Override
     public Stations stations() {
@@ -79,7 +73,7 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     /**
      * Retourne les alias des gares indexées de l'horaire.
      *
-     * @return l'ensemble des alias de gares
+     * @return l'ensemble des alias de gares.
      */
     @Override
     public StationAliases stationAliases() {
@@ -89,7 +83,7 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     /**
      * Retourne les voies ou quais indexés de l'horaire.
      *
-     * @return l'ensemble des voies ou quais
+     * @return l'ensemble des voies ou quais.
      */
     @Override
     public Platforms platforms() {
@@ -99,7 +93,7 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     /**
      * Retourne les lignes de transport public indexées de l'horaire.
      *
-     * @return l'ensemble des lignes
+     * @return l'ensemble des lignes.
      */
     @Override
     public Routes routes() {
@@ -109,7 +103,7 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     /**
      * Retourne les changements (transferts) indexés de l'horaire.
      *
-     * @return l'ensemble des changements
+     * @return l'ensemble des changements.
      */
     @Override
     public Transfers transfers() {
@@ -119,8 +113,8 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     /**
      * Retourne les courses (trips) indexées actives pour la date donnée.
      *
-     * @param date la date considérée
-     * @return l'ensemble des courses actives ce jour-là
+     * @param date la date considérée.
+     * @return l'ensemble des courses actives ce jour-là.
      */
     @Override
     public Trips tripsFor(LocalDate date) {
@@ -137,8 +131,8 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
     /**
      * Retourne les liaisons indexées actives pour la date donnée.
      *
-     * @param date la date considérée
-     * @return l'ensemble des liaisons actives ce jour-là
+     * @param date la date considérée.
+     * @return l'ensemble des liaisons actives ce jour-là.
      */
     @Override
     public Connections connectionsFor(LocalDate date) {

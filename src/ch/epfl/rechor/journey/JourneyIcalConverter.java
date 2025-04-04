@@ -6,10 +6,16 @@ import ch.epfl.rechor.IcalBuilder;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+/**
+ * Classe permettant de convertir un voyage en un événement.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
+ */
 public class JourneyIcalConverter {
 
-    private final static String VERSION = "2.0";
-    private final static String PRODID = "ReCHor";
+    private static final String VERSION = "2.0";
+    private static final String PRODID = "ReCHor";
 
 
     private JourneyIcalConverter() {}
@@ -17,8 +23,8 @@ public class JourneyIcalConverter {
     /**
      * Convertit un objet Journey en une chaîne au format iCalendar.
      *
-     * @param journey l'objet Journey contenant les informations du voyage
-     * @return la chaîne iCalendar générée
+     * @param journey l'objet Journey contenant les informations du voyage.
+     * @return la chaîne iCalendar générée.
      */
     public static String toIcalendar(Journey journey) {
 
@@ -47,7 +53,8 @@ public class JourneyIcalConverter {
                 .add(IcalBuilder.Name.DTSTAMP, java.time.LocalDateTime.now())
                 .add(IcalBuilder.Name.DTSTART, journey.depTime())
                 .add(IcalBuilder.Name.DTEND, journey.arrTime())
-                .add(IcalBuilder.Name.SUMMARY, journey.depStop().name() + " → " + journey.arrStop().name())
+                .add(IcalBuilder.Name.SUMMARY, journey.depStop().name()
+                        + " → " + journey.arrStop().name())
                 .add(IcalBuilder.Name.DESCRIPTION, description)
                 .end()
                 .end();

@@ -8,7 +8,10 @@ import java.util.List;
 import static ch.epfl.rechor.timetable.mapped.Structure.field;
 
 /**
- * La classe permet d'accéder à une table de voies ou quais représentée de manière aplatie
+ * La classe permet d'accéder à une table de voies ou quais représentée de manière aplatie.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
  */
 public final class BufferedPlatforms implements Platforms {
     private final StructuredBuffer structuredBuffer;
@@ -17,11 +20,9 @@ public final class BufferedPlatforms implements Platforms {
     private final static int STATION_ID = 1;
 
     /**
-     * Construit une instance donnant accès aux données aplaties
-     * @param stringTable
-     * Chaine de caractere contenant les donnees du tableau
-     * @param buffer
-     * Tableau de byte contenant les index des donnees du tableau
+     * Construit une instance donnant accès aux données aplaties.
+     * @param stringTable Chaine de caractere contenant les donnees du tableau.
+     * @param buffer Tableau de byte contenant les index des donnees du tableau.
      */
     public BufferedPlatforms(List<String> stringTable, ByteBuffer buffer){
         Structure structure = new Structure(field(NAME_ID, Structure.FieldType.U16),
@@ -31,11 +32,10 @@ public final class BufferedPlatforms implements Platforms {
     }
 
     /**
-     * Retourne le nom de la voie/quai
-     * @param id
-     * l'index de la voie ou du quai
-     * @return le nom de la voie/quai
-     * @throws IndexOutOfBoundsException si l'index est invalide
+     * Retourne le nom de la voie/quai.
+     * @param id l'index de la voie ou du quai.
+     * @return le nom de la voie/quai.
+     * @throws IndexOutOfBoundsException si l'index est invalide.
      */
     @Override
     public String name(int id) {
@@ -43,11 +43,10 @@ public final class BufferedPlatforms implements Platforms {
     }
 
     /**
-     * Retourne l'index de la station lier à la platform
-     * @param id
-     * l'index de la voie ou du quai
-     * @return l'index de la station lier a la platform
-     * @throws IndexOutOfBoundsException si l'index est invalide
+     * Retourne l'index de la station lier à la platform.
+     * @param id l'index de la voie ou du quai.
+     * @return l'index de la station lier a la platform.
+     * @throws IndexOutOfBoundsException si l'index est invalide.
      */
     @Override
     public int stationId(int id) {
@@ -55,8 +54,8 @@ public final class BufferedPlatforms implements Platforms {
     }
 
     /**
-     * Retourne la taille des donnees lier à platform
-     * @return la taille des donnees lier à platform
+     * Retourne la taille des donnees lier à platform.
+     * @return la taille des donnees lier à platform.
      */
     @Override
     public int size() {

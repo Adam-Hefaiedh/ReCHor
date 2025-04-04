@@ -9,6 +9,9 @@ import java.util.*;
 
 /**
  * La classe représente un « extracteur de voyages ».
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
  */
 public class JourneyExtractor {
 
@@ -16,12 +19,10 @@ public class JourneyExtractor {
 
     /**
      * Retourne la totalité des voyages optimaux correspondant au profil et à la gare de départ donnés,
-     * triés d'abord par heure de départ (croissante) puis par heure d'arrivée (croissante)
-     * @param profile
-     * Profile contenant les voyages optimaux vers une gare d'index donnée
-     * @param depStationId
-     * Index de gare dont le voyage commence
-     * @return la totalité des voyages optimaux correspondant au profil et à la gare de départ donnés
+     * triés d'abord par heure de départ (croissante) puis par heure d'arrivée (croissante).
+     * @param profile Profile contenant les voyages optimaux vers une gare d'index donnée.
+     * @param depStationId Index de gare dont le voyage commence.
+     * @return la totalité des voyages optimaux correspondant au profil et à la gare de départ donnés.
      */
     public static List<Journey> journeys(Profile profile, int depStationId){
         ParetoFront pf = profile.forStation(depStationId);
@@ -37,7 +38,8 @@ public class JourneyExtractor {
         return journeys;
     }
 
-    private static void createJourney(long criteria, int depStationId, Profile profile, List<Journey.Leg> legs){
+    private static void createJourney(long criteria, int depStationId, Profile profile,
+                                      List<Journey.Leg> legs){
         Connections connections = profile.connections();
         TimeTable timeTable = profile.timeTable();
         int intermediateChanges = Bits32_24_8.unpack8(PackedCriteria.payload(criteria));
@@ -54,7 +56,8 @@ public class JourneyExtractor {
             arrStationId = connections.arrStopId(connectionId);
                 newCriteria =
                         profile.forStation(timeTable.stationId(arrStationId))
-                                .get(PackedCriteria.arrMins(criteria),PackedCriteria.changes(criteria) - i);
+                                .get(PackedCriteria.arrMins(criteria),
+                                        PackedCriteria.changes(criteria) - i);
                 int arrHours = connections.arrMins(connectionId);
                 connectionId = Bits32_24_8.unpack24(PackedCriteria.payload(newCriteria));
                 intermediateChanges = Bits32_24_8.unpack8(PackedCriteria.payload(newCriteria));
@@ -63,10 +66,12 @@ public class JourneyExtractor {
         connectionId = createTransport(profile, connectionId, legs, intermediateChanges);
         arrStationId = connections.arrStopId(connectionId);
         if(timeTable.stationId(connections.arrStopId(connectionId)) != profile.arrStationId()){
-            createFoot(profile, arrStationId, profile.arrStationId(), connections.arrMins(connectionId),legs);
+            createFoot(profile, arrStationId, profile.arrStationId(),
+                    connections.arrMins(connectionId),legs);
         }
     }
-    private static int createTransport(Profile profile, int connectionId, List<Journey.Leg> legs, int intermediateChanges)
+    private static int createTransport(Profile profile, int connectionId, List<Journey.Leg> legs,
+                                       int intermediateChanges)
     {
         TimeTable timeTable = profile.timeTable();
         Stations stations = timeTable.stations();
@@ -97,7 +102,8 @@ public class JourneyExtractor {
         return connectionId;
     }
 
-    private static void createFoot(Profile profile, int depStationId, int arrStationId, int depHour, List<Journey.Leg> legs){
+    private static void createFoot(Profile profile, int depStationId,
+                                   int arrStationId, int depHour, List<Journey.Leg> legs){
         TimeTable timeTable = profile.timeTable();
         Stations stations = timeTable.stations();
         Transfers transfers = timeTable.transfers();

@@ -10,6 +10,9 @@ import static java.lang.System.arraycopy;
 
 /**
  * La classe représente une frontière de Pareto de critères d'optimisation.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
  */
 public final class ParetoFront {
     private final long[] tuples;
@@ -20,8 +23,8 @@ public final class ParetoFront {
     }
 
     /**
-     * Retourne la taille de la frontière de Pareto
-     * @return le nombre de tuples (paires ou triplets de critères d'optimisation) qu'elle contient
+     * Retourne la taille de la frontière de Pareto.
+     * @return le nombre de tuples (paires ou triplets de critères d'optimisation) qu'elle contient.
      */
     public int size(){
         return tuples.length;
@@ -29,14 +32,12 @@ public final class ParetoFront {
 
     /**
      * Retourne les critères d'optimisation empaquetés dont
-     * l'heure d'arrivée et le nombre de changements sont ceux donnés
-     * @param arrMins
-     * L'heure d'arrivée du critère à trouver
-     * @param changes
-     * Le nombre de changements du critère à trouver
-     * @return le critère contenant cette heure d'arrivée et ce nombre de changements
+     * l'heure d'arrivée et le nombre de changements sont ceux donnés.
+     * @param arrMins L'heure d'arrivée du critère à trouver.
+     * @param changes Le nombre de changements du critère à trouver.
+     * @return le critère contenant cette heure d'arrivée et ce nombre de changements.
      *
-     * @throws NoSuchElementException si les criteres en parametre ne sont pas dans le tableau
+     * @throws NoSuchElementException si les criteres en parametre ne sont pas dans le tableau.
      */
     public long get(int arrMins, int changes)
     {
@@ -52,8 +53,7 @@ public final class ParetoFront {
     /**
      * Appelle la méthode accept de l'action de type LongConsumer donnée
      * avec chacun des critères de la frontière, dans l'ordre.
-     * @param action
-     * L'action à effectuer pour chaque critère
+     * @param action L'action a effectué pour chaque critère.
      */
     public void forEach(LongConsumer action){
         for(long criteria : tuples){
@@ -62,7 +62,7 @@ public final class ParetoFront {
     }
 
     /**
-     * La classe représente un bâtisseur de frontière de Pareto
+     * La classe représente un bâtisseur de frontière de Pareto.
      */
     public static class Builder{
         private long[] tuples_build;
@@ -71,7 +71,7 @@ public final class ParetoFront {
         private static final int MAX_PAYLOAD = 0xFFFFFFFF;
 
         /**
-         * Retourne un bâtisseur dont la frontière en cours de construction est vide
+         * Retourne un bâtisseur dont la frontière en cours de construction est vide.
          */
         public Builder(){
             tuples_build = new long[2];
@@ -81,9 +81,8 @@ public final class ParetoFront {
 
         /**
          * Retourne un nouveau bâtisseur avec les
-         * mêmes attributs que celui reçu en argument
-         * @param that
-         * Bâtisseur à copier
+         * mêmes attributs que celui reçu en argument.
+         * @param that Bâtisseur à copier.
          **/
         public Builder(Builder that) {
             tuples_build = that.tuples_build;
@@ -92,16 +91,16 @@ public final class ParetoFront {
         }
 
         /**
-         * Retourne vrai si et seulement si la frontière en cours de construction est vide
-         * @return Si le tableau tuple est vide
+         * Retourne vrai si et seulement si la frontière en cours de construction est vide.
+         * @return Si le tableau tuple est vide.
          */
         public boolean isEmpty(){
             return size_effective == 0;
         }
 
         /**
-         * Vide la frontière en cours de construction en supprimant tous ses éléments
-         * @return Le builder courant
+         * Vide la frontière en cours de construction en supprimant tous ses éléments.
+         * @return Le builder courant.
          */
         public Builder clear(){
             tuples_build = EMPTY.tuples;
@@ -111,10 +110,9 @@ public final class ParetoFront {
         }
 
         /**
-         * Ajoute à la frontière le tuple de critères empaquetés donné
-         * @param packedTuple
-         * Le tuple de critères empaquetés qui doit etre ajouté.
-         * @return Le builder courant
+         * Ajoute à la frontière le tuple de critères empaquetés donné.
+         * @param packedTuple Le tuple de critères empaquetés qui doit etre ajouté.
+         * @return Le builder courant.
          */
         public Builder add(long packedTuple){
             int pos = -1;
@@ -160,14 +158,11 @@ public final class ParetoFront {
 
         /**
          * Ajoute à la frontière un tuple de critères augmentés ayant
-         * l'heure d'arrivée, le nombre de changements et la charge utile donnés
-         * @param arrMins
-         * L'heure d'arrivée donnée
-         * @param changes
-         * Le nombre de changements donné
-         * @param payload
-         * La charge utile donnée
-         * @return Le builder courant
+         * l'heure d'arrivée, le nombre de changements et la charge utile donnés.
+         * @param arrMins L'heure d'arrivée donnée.
+         * @param changes Le nombre de changements donné.
+         * @param payload La charge utile donnée.
+         * @return Le builder courant.
          */
         public Builder add(int arrMins, int changes, int payload){
             return add(pack(arrMins,changes,payload));
@@ -175,10 +170,9 @@ public final class ParetoFront {
 
         /**
          * Ajoute à la frontière tous les tuples présents dans
-         * la frontière en cours de construction par le bâtisseur donné
-         * @param that
-         * Le bâtisseur donné
-         * @return Le builder courant
+         * la frontière en cours de construction par le bâtisseur donné.
+         * @param that Le bâtisseur donné.
+         * @return Le builder courant.
          */
         public Builder addAll(Builder that){
             for(int i=0; i<that.size_effective; i++){
@@ -189,13 +183,11 @@ public final class ParetoFront {
 
         /**
          *  Retourne vrai si et seulement si la totalité des tuples de la frontière donnée,
-         *  une fois que leur heure de départ a été fixée sur celle donnée, sont dominés par au moins un tuple du récepteur
-         * @param that
-         * La frontière donnée
-         * @param depMins
-         * l'heure de départ donnée
+         *  une fois que leur heure de départ a été fixée sur celle donnée, sont dominés par au moins un tuple du récepteur.
+         * @param that La frontière donnée.
+         * @param depMins l'heure de départ donnée.
          * @return vrai si et seulement si la totalité des tuples, de la frontière
-         * donnée, sont dominés par au moins un tuple du récepteur
+         * donnée, sont dominés par au moins un tuple du récepteur.
          */
         public boolean fullyDominates(Builder that, int depMins){
             boolean dominate;
@@ -217,8 +209,7 @@ public final class ParetoFront {
         /**
          * Appelle la méthode accept de l'action de type LongConsumer donnée
          * avec chacun des critères de la frontière, dans l'ordre.
-         * @param action
-         * L'action à effectuer pour chaque critère
+         * @param action L'action a effectué pour chaque critère.
          */
         public void forEach(LongConsumer action){
             for(int i=0; i<size_effective; i++){
@@ -228,7 +219,7 @@ public final class ParetoFront {
 
         /**
          * Retourne la frontière de Pareto en cours de construction par ce bâtisseur.
-         * @return la frontière de Pareto en cours de construction par ce bâtisseur
+         * @return la frontière de Pareto en cours de construction par ce bâtisseur.
          */
         public ParetoFront build(){
             long[] tuples_build1 = new long[size_effective];
