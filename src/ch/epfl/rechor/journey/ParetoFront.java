@@ -1,5 +1,7 @@
 package ch.epfl.rechor.journey;
 
+import org.w3c.dom.ls.LSOutput;
+
 import java.util.NoSuchElementException;
 import java.util.function.LongConsumer;
 
@@ -9,7 +11,7 @@ import static java.lang.System.arraycopy;
 /**
  * La classe représente une frontière de Pareto de critères d'optimisation.
  */
-public class ParetoFront {
+public final class ParetoFront {
     private final long[] tuples;
     public static final ParetoFront EMPTY = new ParetoFront(new long[0]);
 
@@ -45,6 +47,7 @@ public class ParetoFront {
         }
         throw new NoSuchElementException();
     }
+
 
     /**
      * Appelle la méthode accept de l'action de type LongConsumer donnée
