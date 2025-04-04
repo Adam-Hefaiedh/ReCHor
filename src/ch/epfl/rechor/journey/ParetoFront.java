@@ -114,36 +114,12 @@ public final class ParetoFront {
          * @return Le builder courant.
          */
         public Builder add(long packedTuple){
-            int pos = -1;
-            int size = 0;
-            while(size != size_effective && pos == -1)
-            {
-                if(tuples_build[size] <= withPayload(packedTuple,MAX_PAYLOAD)){
-                    if(dominatesOrIsEqual(tuples_build[size], packedTuple)){
-                        return this;
-                    }
-                    size++;
-                }
-                else pos = size;
-            }
-            if(size == size_effective){
-                if(size_effective == capacity){
-                    long[] tuples_build1 = new long[capacity*3/2 +1];
-                    arraycopy(tuples_build,0,tuples_build1,0,capacity);
-                    capacity++;
-                    tuples_build = tuples_build1;
-                }
-                tuples_build[size_effective] = packedTuple;
-                size_effective++;
+            int pos = foundPosition(packedTuple);
+            if(pos == -1){
                 return this;
             }
 
-            int dest = pos;
-            for(int i=pos; i<size_effective; i++) {
-                if (dominatesOrIsEqual(packedTuple, tuples_build[i]))continue;
-                if (dest != i) tuples_build[dest] = tuples_build[i];
-                dest += 1;
-            }
+            int dest = eliminateDominator(pos, packedTuple);
 
             long[] tuples_build2 = new long[dest*3/2 +1];
             arraycopy(tuples_build,0,tuples_build2,0,pos);
@@ -153,6 +129,47 @@ public final class ParetoFront {
             size_effective = dest+1;
             tuples_build = tuples_build2;
             return this;
+        }
+
+        private int eliminateDominator(int pos, long packedTuple)
+        {
+            int dest = pos;
+            for(int i=pos; i<size_effective; i++) {
+                if (dominatesOrIsEqual(packedTuple, tuples_build[i]))continue;
+                if (dest != i) tuples_build[dest] = tuples_build[i];
+                dest += 1;
+            }
+            return dest;
+        }
+
+        private int foundPosition(long packedTuple)
+        {
+            int pos = -1;
+            int size = 0;
+            while(size != size_effective && pos == -1)
+            {
+                if(tuples_build[size] <= withPayload(packedTuple,MAX_PAYLOAD)){
+                    if(dominatesOrIsEqual(tuples_build[size], packedTuple)){
+                        return -1;
+                    }
+                    size++;
+                }
+                else pos = size;
+            }
+
+            if(size == size_effective){
+                if(size_effective == capacity){
+                    long[] tuples_build1 = new long[capacity*3/2 +1];
+                    arraycopy(tuples_build,0,tuples_build1,0,capacity);
+                    capacity++;
+                    tuples_build = tuples_build1;
+                }
+                tuples_build[size_effective] = packedTuple;
+                size_effective++;
+                return -1;
+            }
+
+            return pos;
         }
 
         /**

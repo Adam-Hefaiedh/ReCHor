@@ -9,8 +9,7 @@ package ch.epfl.rechor;
  */
 public class PackedRange {
 
-    private PackedRange() {
-    }
+    private PackedRange() {}
 
     /**
      * Retourne la valeur de type int représentant l'intervalle d'entiers allant

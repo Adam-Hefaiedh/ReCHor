@@ -58,10 +58,15 @@ public class Structure {
      * @throws IllegalArgumentException si les index de fields ne sont pas dans l'ordre.
      */
     public Structure(Field... fields){
-        int pos = 0;
         fieldPosition = new int[fields.length];
+        totalSize = createFieldTable(fields);
+    }
+
+    private int createFieldTable(Field... fields)
+    {
+        int pos = 0;
         int size = 0;
-        for (int i = 0; i < fields.length; i++){
+        for (int i = 0; i < fieldPosition.length; i++){
 
             Preconditions.checkArgument(fields[i].index() == i );
 
@@ -73,7 +78,7 @@ public class Structure {
             }
             pos += size;
         }
-        totalSize = pos;
+        return pos;
     }
 
     /**

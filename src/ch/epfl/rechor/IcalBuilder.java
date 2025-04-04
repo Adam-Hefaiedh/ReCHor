@@ -74,16 +74,15 @@ public final class IcalBuilder {
         int maxLength = 75;
         int lineLength = line.length();
         int index = 0;
-        int end = Math.min(index + maxLength, lineLength);
-        folded.append(line, index, end);
-        folded.append("\r\n");
-        index = end;
+        int space = 0;
+        int end;
         while (index < lineLength) {
             folded.append(" ");
-            end = Math.min(index + maxLength-1, lineLength);
+            end = Math.min(index + maxLength-space, lineLength);
             folded.append(line, index, end);
             folded.append("\r\n");
             index = end;
+            if(space !=1 )space = 1;
         }
         return folded.toString();
     }

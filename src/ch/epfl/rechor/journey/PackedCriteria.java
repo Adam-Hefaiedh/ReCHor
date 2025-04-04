@@ -11,17 +11,17 @@ import static java.lang.Integer.toUnsignedLong;
  * @author El Hassan Lyoussi (398924).
  */
 public class PackedCriteria {
-    private static final int MINIMUM_HOURS = -240;
-    private static final int MAXIMUM_HOURS = 2880;
-    private static final int MAX_BIT_CHANGE = 32;
-    private static final int MAX_BIT_DEPART = 51;
-    private static final int MAX_BIT_ARR = 39;
+    private static final int MINIMUM_HOURS      = -240;
+    private static final int MAXIMUM_HOURS      = 2880;
+    private static final int MAX_BIT_CHANGE     = 32;
+    private static final int MAX_BIT_DEPART     = 51;
+    private static final int MAX_BIT_ARR        = 39;
     private static final int MAX_HOURS_POSSIBLE = 4095;
-    private static final long NO_DEPART = 0x1FFFFFFFFFFFFL;
-    private static final int CHANGES_POSITION = 7;
-    private static final int CHANGES_SIZE = 127;
-    private static final long ADD_CHANGES = 1L;
-    private static final long NO_PAYLOAD = ~(0xFFFFFFFFL);
+    private static final long NO_DEPART         = 0x1FFFFFFFFFFFFL;
+    private static final int CHANGES_POSITION   = 7;
+    private static final int CHANGES_SIZE       = 127;
+    private static final long ADD_CHANGES       = 1L;
+    private static final long NO_PAYLOAD        = ~(0xFFFFFFFFL);
 
     private PackedCriteria(){}
 
