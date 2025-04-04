@@ -3,7 +3,7 @@ package ch.epfl.rechor.journey;
 import java.util.List;
 
 /**
- * Class representant les differents types de vehicule.
+ * Class représentant les différents types de véhicule.
  *
  * @author Adam Taieb Hefaiedh (391029).
  * @author El Hassan Lyoussi (398924).

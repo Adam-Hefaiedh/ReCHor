@@ -57,7 +57,7 @@ public class PackedCriteria {
      * des critères empaquetés donnés.
      * @param criteria Les critères empaquetés.
      * @return l'heure de départ.
-     * @throws IllegalArgumentException si la valeur long ne contient pas de depmins.
+     * @throws IllegalArgumentException si la valeur long ne contient pas d'heure de départ.
      */
     public static int depMins(long criteria){
         Preconditions.checkArgument(hasDepMins(criteria));
@@ -101,7 +101,7 @@ public class PackedCriteria {
      * @param criteria1 Les premiers critères empaquetés.
      * @param criteria2 Les seconds critères empaquetés.
      * @return vrai si les premiers critères empaquetés dominent où sont égaux aux seconds.
-     * @throws IllegalArgumentException si un critère empaqueté possede un depmins alors que l'autre non.
+     * @throws IllegalArgumentException si un critère empaqueté possède une heure de départ alors que l'autre non.
      */
     public static boolean dominatesOrIsEqual(long criteria1, long criteria2){
         Preconditions.checkArgument(hasDepMins(criteria1) == hasDepMins(criteria2));

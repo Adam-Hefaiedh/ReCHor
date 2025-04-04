@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Class representant un voyage.
+ * Classe représentant un voyage.
  * @param legs les étapes du voyage.
  *
  * @author Adam Taieb Hefaiedh (391029).
@@ -18,14 +18,14 @@ import java.util.Objects;
 
 public record Journey(List<Leg> legs) {
     /**
-     * Le constructeur verifie que :
+     * Le constructeur vérifie que :
      * elle n'est pas vide,
      * les étapes à pied alternent avec celles en transport,
      * pour toutes les étapes sauf la première, l'instant de départ ne précède pas celui d'arrivée de la précédente,
      * pour toutes les étapes sauf la première, l'arrêt de départ est identique à l'arrêt d'arrivée de la précédente.
      * @param legs les étapes du voyage.
      *
-     * @throws IllegalArgumentException si un parametre n'est pas valide.
+     * @throws IllegalArgumentException si un paramètre n'est pas valide.
      */
     public Journey{
         Preconditions.checkArgument(!legs.isEmpty());
@@ -40,7 +40,7 @@ public record Journey(List<Leg> legs) {
 
     /**
      * Retourne l'arrêt de départ du voyage.
-     * @return l'arrêt de la premiere etape.
+     * @return l'arrêt de la premiere étape.
      */
     public Stop depStop()
     {
@@ -49,7 +49,7 @@ public record Journey(List<Leg> legs) {
 
     /**
      * Retourne l'arrêt d'arrivée du voyage.
-     * @return l'arrêt d'arrivée de la derniere etape.
+     * @return l'arrêt d'arrivée de la dernière étape.
      */
     public Stop arrStop()
     {
@@ -58,7 +58,7 @@ public record Journey(List<Leg> legs) {
 
     /**
      *  Retourne la date/heure de début du voyage.
-     * @return la date/heure de la premiere etape.
+     * @return la date/heure de la premiere étape.
      */
     public LocalDateTime depTime(){
         return legs.getFirst().depTime();
@@ -66,7 +66,7 @@ public record Journey(List<Leg> legs) {
 
     /**
      * Retourne la date/heure de fin du voyage.
-     * @return la date/heure de la derniere etape.
+     * @return la date/heure de la dernière étape.
      */
     public LocalDateTime arrTime(){
         return legs.getLast().arrTime();
@@ -74,14 +74,14 @@ public record Journey(List<Leg> legs) {
 
     /**
      * Retourne la durée totale du voyage.
-     * @return la durée qui separe la date/heure de fin de celle de début.
+     * @return la durée qui sépare la date/heure de fin de celle de début.
      */
     public Duration duration(){
         return Duration.between(depTime(), arrTime());
     }
 
     /**
-     * Represente les etapes du voyage.
+     * Représente les étapes du voyage.
      */
     public sealed interface Leg{
         /**
@@ -121,7 +121,7 @@ public record Journey(List<Leg> legs) {
         }
 
         /**
-         * Class representant un arrêt auquel le moyen de transport utilisé s'arrête effectivement,
+         * Class représentant un arrêt auquel le moyen de transport utilisé s'arrête effectivement,
          * mais qui se trouve entre l'arrêt de départ et l'arrêt d'arrivée de l'étape.
          * @param stop l'arrêt intermédiaire en question.
          * @param arrTime la date/heure d'arrivée à l'arrêt.
@@ -129,7 +129,7 @@ public record Journey(List<Leg> legs) {
          */
         record IntermediateStop(Stop stop, LocalDateTime arrTime, LocalDateTime depTime){
             /**
-             * Le constructeur verifie que stop n'est pas null et
+             * Le constructeur vérifie que stop n'est pas null et
              * la date/heure de départ n'est pas antérieure à celle d'arrivée.
              * @param stop l'arrêt intermédiaire en question.
              * @param arrTime la date/heure d'arrivée à l'arrêt.
@@ -157,7 +157,7 @@ public record Journey(List<Leg> legs) {
          */
         record Transport(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime, List<IntermediateStop> intermediateStops, Vehicle vehicle, String route, String destination) implements Leg{
             /**
-             * Le constructeur verifie qu'aucun argument n'est null et
+             * Le constructeur vérifie qu'aucun argument n'est null et
              * que la date/heure d'arrivée n'est pas antérieure à celle de départ.
              * @param depStop l'arrêt de départ de l'étape.
              * @param depTime la date/heure de départ de l'étape.
@@ -190,14 +190,14 @@ public record Journey(List<Leg> legs) {
          */
         record Foot(Stop depStop, LocalDateTime depTime, Stop arrStop, LocalDateTime arrTime) implements Leg{
             /**
-             * Le constructeur verifie qu'aucun argument n'est null et
+             * Le constructeur vérifie qu'aucun argument n'est null et
              * que la date/heure d'arrivée n'est pas antérieure à celle de départ.
              * @param depStop l'arrêt de départ de l'étape.
              * @param depTime la date/heure de départ de l'étape.
              * @param arrStop l'arrêt d'arrivée de l'étape.
              * @param arrTime la date/heure d'arrivée de l'étape.
              * @throws IllegalArgumentException si l'heure de depart est apres l'heure d'arriver.
-             * @throws NullPointerException si les arrets sont null.
+             * @throws NullPointerException si les arrêts sont null.
              */
             public Foot{
                 Objects.requireNonNull(depStop);

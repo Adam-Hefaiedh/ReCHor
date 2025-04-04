@@ -66,7 +66,7 @@ public final class IcalBuilder {
      * Si la ligne est trop longue, elle est découpée en segments de 75 caractères maximum et chaque segment
      * supplémentaire commence par un espace.
      *
-     * @param line la ligne a plié.
+     * @param line la ligne a plier.
      * @return la ligne pliée selon le format iCalendar.
      */
     private String foldLine(String line) {
@@ -91,7 +91,7 @@ public final class IcalBuilder {
      * Ajoute une propriété de type date/heure en formatant la date selon le standard iCalendar.
      *
      * @param name      le nom de la propriété.
-     * @param dateTime  la date et l'heure a ajouté.
+     * @param dateTime  la date et l'heure à ajouter.
      * @return l'instance courante de IcalBuilder pour permettre l'enchaînement des appels.
      */
     public IcalBuilder add(Name name, LocalDateTime dateTime){

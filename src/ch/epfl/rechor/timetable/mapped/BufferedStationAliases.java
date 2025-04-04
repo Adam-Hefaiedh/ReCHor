@@ -21,7 +21,7 @@ public final class BufferedStationAliases implements StationAliases {
 
     /**
      * Construit une instance donnant accès aux données aplaties.
-     * @param stringTable Chaine de caractere contenant les donnees du tableau.
+     * @param stringTable Chaine de caractère contenant les donnees du tableau.
      * @param buffer Tableau de byte contenant les index des donnees du tableau.
      */
     public BufferedStationAliases(List<String> stringTable, ByteBuffer buffer){

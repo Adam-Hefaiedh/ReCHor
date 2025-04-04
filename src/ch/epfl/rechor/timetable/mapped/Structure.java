@@ -16,7 +16,7 @@ public class Structure {
     private final int totalSize;
 
     /**
-     * Classe representant les differentes tailles de champ.
+     * Classe représentant les différentes tailles de champ.
      */
     public enum FieldType{
         U8,
@@ -31,7 +31,7 @@ public class Structure {
      */
     public record Field(int index, FieldType type) {
         /**
-         * Verifie si le type est null ou pas.
+         * Vérifie si le type est null ou pas.
          * @param index index du champ dans le tableau.
          * @param type type du champ.
          *
@@ -85,9 +85,9 @@ public class Structure {
     /**
      *  Retourne l'index, dans le tableau d'octets contenant les données aplaties,
      *  du premier octet du champ d'index fieldIndex de l'élément d'index elementIndex.
-     * @param fieldIndex L'index du champ desirer.
-     * @param elementIndex L'index d'element desirer.
-     * @return l'index de la donner desirer dans le tableau.
+     * @param fieldIndex L'index du champ desiré.
+     * @param elementIndex L'index d'élément desiré.
+     * @return l'index de la donner desiré dans le tableau.
      *
      * @throws IndexOutOfBoundsException si l'index de champ est invalide.
      */

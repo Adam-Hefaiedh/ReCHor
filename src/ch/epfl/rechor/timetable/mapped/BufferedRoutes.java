@@ -22,7 +22,7 @@ public final class BufferedRoutes implements Routes {
 
     /**
      * Construit une instance donnant accès aux données aplaties.
-     * @param stringTable Chaine de caractere contenant les donnees du tableau.
+     * @param stringTable Chaine de caractère contenant les donnees du tableau.
      * @param buffer Tableau de byte contenant les index des donnees du tableau.
      */
     public BufferedRoutes(List<String> stringTable, ByteBuffer buffer){
@@ -37,7 +37,7 @@ public final class BufferedRoutes implements Routes {
      *
      * @param id l'index de la ligne.
      * @return le véhicule associé à la ligne.
-     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size()).
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à zero ou supérieur ou égal à size()).
      */
     @Override
     public Vehicle vehicle(int id) {
@@ -49,7 +49,7 @@ public final class BufferedRoutes implements Routes {
      *
      * @param id l'index de la ligne.
      * @return le nom de la ligne.
-     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size()).
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à zero ou supérieur ou égal à size()).
      */
     @Override
     public String name(int id) {

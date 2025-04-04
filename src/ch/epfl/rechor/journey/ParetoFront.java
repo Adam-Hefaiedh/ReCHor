@@ -1,6 +1,5 @@
 package ch.epfl.rechor.journey;
 
-import org.w3c.dom.ls.LSOutput;
 
 import java.util.NoSuchElementException;
 import java.util.function.LongConsumer;
@@ -37,13 +36,13 @@ public final class ParetoFront {
      * @param changes Le nombre de changements du critère à trouver.
      * @return le critère contenant cette heure d'arrivée et ce nombre de changements.
      *
-     * @throws NoSuchElementException si les criteres en parametre ne sont pas dans le tableau.
+     * @throws NoSuchElementException si les critères en paramètre ne sont pas dans le tableau.
      */
     public long get(int arrMins, int changes)
     {
-        for(long critere : tuples){
-            if(PackedCriteria.arrMins(critere) == arrMins && PackedCriteria.changes(critere) == changes){
-                return critere;
+        for(long criteria : tuples){
+            if(PackedCriteria.arrMins(criteria) == arrMins && PackedCriteria.changes(criteria) == changes){
+                return criteria;
             }
         }
         throw new NoSuchElementException();
@@ -111,7 +110,7 @@ public final class ParetoFront {
 
         /**
          * Ajoute à la frontière le tuple de critères empaquetés donné.
-         * @param packedTuple Le tuple de critères empaquetés qui doit etre ajouté.
+         * @param packedTuple Le tuple de critères empaquetés qui doit être ajouté.
          * @return Le builder courant.
          */
         public Builder add(long packedTuple){

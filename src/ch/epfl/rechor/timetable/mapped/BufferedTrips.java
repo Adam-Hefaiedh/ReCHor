@@ -20,7 +20,7 @@ public final class BufferedTrips implements Trips {
 
     /**
      * Construit une instance donnant accès aux données aplaties.
-     * @param stringTable Chaine de caractere contenant les donnees du tableau.
+     * @param stringTable Chaine de caractère contenant les donnees du tableau.
      * @param buffer Tableau de byte contenant les index/donnees du tableau.
      */
     public BufferedTrips(List<String> stringTable, ByteBuffer buffer){
@@ -36,7 +36,7 @@ public final class BufferedTrips implements Trips {
      *
      * @param id l'index de la course.
      * @return l'index de la ligne associée à la course.
-     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size()).
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à zero ou supérieur ou égal à size()).
      */
     @Override
     public int routeId(int id) {
@@ -48,7 +48,7 @@ public final class BufferedTrips implements Trips {
      *
      * @param id l'index de la course.
      * @return le nom de la destination finale de la course.
-     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à 0 ou supérieur ou égal à size()).
+     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à zero ou supérieur ou égal à size()).
      */
     @Override
     public String destination(int id) {

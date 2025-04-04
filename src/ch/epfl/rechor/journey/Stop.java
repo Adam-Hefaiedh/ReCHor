@@ -6,7 +6,7 @@ import java.util.Objects;
 
 
 /**
- * Class representant les arrêts de transport public.
+ * Class représentant les arrêts de transport public.
  * @param name Le nom de l'arrêt, ou le nom de la gare à laquelle appartient l'arrêt.
  * @param platformName le nom de la voie ou du quai de l'arrêt, ou null si l'arrêt correspond à une gare.
  * @param longitude la longitude de la position de l'arrêt, en degrés.
@@ -22,7 +22,7 @@ public record Stop(String name, String platformName, double longitude, double la
     private final static int MIN_LATITUDE = -90;
 
     /**
-     * Constructeur verifiant si le nom de l'arret n'est pas null et que
+     * Constructeur vérifiant si le nom de l'arrêt n'est pas null et que
      * la longitude soit entre -180 et 180 (inclus) et la latitude entre
      * -90 et 90 (inclus).
      * @param name Le nom de l'arrêt, ou le nom de la gare à laquelle appartient l'arrêt.

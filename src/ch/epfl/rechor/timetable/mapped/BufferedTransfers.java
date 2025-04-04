@@ -21,7 +21,7 @@ public final class BufferedTransfers implements Transfers {
     private final int[] arrStations;
 
     /**
-     * Chaine de caractere contenant les donnees du tableau.
+     * Chaine de caractère contenant les donnees du tableau.
      * @param buffer Tableau de byte contenant les index/donnees du tableau.
      */
     public BufferedTransfers(ByteBuffer buffer){
@@ -29,23 +29,29 @@ public final class BufferedTransfers implements Transfers {
                 field(ARR_STATION_ID, Structure.FieldType.U16),
                 field(TRANSFER_MINUTES, Structure.FieldType.U8));
         structuredBuffer = new StructuredBuffer(structure, buffer);
+        arrStations = createTable();
+    }
+
+    private int[] createTable()
+    {
         int capacity = 0;
-        for(int i=0; i<size(); i++){
+        for(int i=0; i< size(); i++){
             if(structuredBuffer.getU16(ARR_STATION_ID,i)> capacity){
                 capacity = structuredBuffer.getU16(ARR_STATION_ID,i);
             }
         }
-        arrStations = new int[capacity+1];
+        int [] arrStations = new int[capacity+1];
         int FirstStation=0;
         int arrStation_id_init =  0;
         for(int i=0; i<size(); i++){
-           if (arrStation_id_init != structuredBuffer.getU16(ARR_STATION_ID,i)) {
+            if (arrStation_id_init != structuredBuffer.getU16(ARR_STATION_ID,i)) {
                 arrStations[arrStation_id_init] = PackedRange.pack(FirstStation,i);
                 FirstStation = i;
                 arrStation_id_init = structuredBuffer.getU16(ARR_STATION_ID,i);
             }
         }
         arrStations[arrStation_id_init] = PackedRange.pack(FirstStation,size());
+        return arrStations;
     }
 
     /**
