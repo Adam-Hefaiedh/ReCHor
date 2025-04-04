@@ -12,5 +12,5 @@ public interface Indexed {
      *
      * @return le nombre d'éléments dans la collection
      */
-    public abstract int size();
+    public int size();
 }

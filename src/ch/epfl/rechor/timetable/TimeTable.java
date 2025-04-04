@@ -15,35 +15,35 @@ public interface TimeTable {
      *
      * @return l'ensemble des gares
      */
-    abstract Stations stations();
+    Stations stations();
 
     /**
      * Retourne les alias des gares indexées de l'horaire.
      *
      * @return l'ensemble des alias de gares
      */
-    abstract StationAliases stationAliases();
+    StationAliases stationAliases();
 
     /**
      * Retourne les voies ou quais indexés de l'horaire.
      *
      * @return l'ensemble des voies ou quais
      */
-    abstract Platforms platforms();
+    Platforms platforms();
 
     /**
      * Retourne les lignes de transport public indexées de l'horaire.
      *
      * @return l'ensemble des lignes
      */
-    abstract Routes routes();
+    Routes routes();
 
     /**
      * Retourne les changements (transferts) indexés de l'horaire.
      *
      * @return l'ensemble des changements
      */
-    abstract Transfers transfers();
+    Transfers transfers();
 
     /**
      * Retourne les courses (trips) indexées actives pour la date donnée.
@@ -51,7 +51,7 @@ public interface TimeTable {
      * @param date la date considérée
      * @return l'ensemble des courses actives ce jour-là
      */
-    abstract Trips tripsFor(LocalDate date);
+    Trips tripsFor(LocalDate date);
 
     /**
      * Retourne les liaisons indexées actives pour la date donnée.
@@ -59,7 +59,7 @@ public interface TimeTable {
      * @param date la date considérée
      * @return l'ensemble des liaisons actives ce jour-là
      */
-    abstract Connections connectionsFor(LocalDate date);
+    Connections connectionsFor(LocalDate date);
 
     /**
      * Retourne vrai si et seulement si l'index d'arrêt donné correspond à une gare.

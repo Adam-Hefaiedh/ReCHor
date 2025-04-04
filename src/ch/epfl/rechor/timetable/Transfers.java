@@ -17,7 +17,7 @@ public interface Transfers extends Indexed {
      * @return l'index de la gare de départ associée à ce changement
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int depStationId(int id);
+    int depStationId(int id);
 
     /**
      * Retourne la durée, en minutes, du changement pour le changement d'index donné.
@@ -26,7 +26,7 @@ public interface Transfers extends Indexed {
      * @return la durée du changement en minutes
      * @throws IndexOutOfBoundsException si l'index id est invalide
      */
-    abstract int minutes(int id);
+    int minutes(int id);
 
     /**
      * Retourne l'intervalle empaqueté, selon la convention utilisée par PackedRange,
@@ -36,7 +36,7 @@ public interface Transfers extends Indexed {
      * @return l'intervalle empaqueté des index des changements pour cette gare d'arrivée
      * @throws IndexOutOfBoundsException si l'index stationId est invalide
      */
-    abstract int arrivingAt(int stationId);
+    int arrivingAt(int stationId);
 
     /**
      * Retourne la durée, en minutes, du changement entre les deux gares identifiées par les index donnés.
@@ -48,6 +48,6 @@ public interface Transfers extends Indexed {
      * @throws IndexOutOfBoundsException si l'un des index est invalide
      * @throws NoSuchElementException si aucun changement n'est possible entre les deux gares
      */
-    abstract int minutesBetween(int depStationId, int arrStationId);
+    int minutesBetween(int depStationId, int arrStationId);
 
 }

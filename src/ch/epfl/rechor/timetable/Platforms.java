@@ -15,7 +15,7 @@ public interface Platforms extends Indexed {
      * @return le nom de la voie ou du quai
      * @throws IndexOutOfBoundsException si l'index est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract String name(int id);
+    String name(int id);
 
     /**
      * Retourne l'index de la gare à laquelle appartient la voie ou le quai identifié par l'index donné.
@@ -24,5 +24,5 @@ public interface Platforms extends Indexed {
      * @return l'index de la gare associée
      * @throws IndexOutOfBoundsException si l'index est invalide (inférieur à 0 ou supérieur ou égal à size())
      */
-    abstract int stationId(int id);
+    int stationId(int id);
 }
