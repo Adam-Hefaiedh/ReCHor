@@ -31,32 +31,16 @@ public final class BufferedPlatforms implements Platforms {
         this.stringTable = stringTable;
     }
 
-    /**
-     * Retourne le nom de la voie/quai.
-     * @param id l'index de la voie ou du quai.
-     * @return le nom de la voie/quai.
-     * @throws IndexOutOfBoundsException si l'index est invalide.
-     */
     @Override
     public String name(int id) {
         return stringTable.get(structuredBuffer.getU16(NAME_ID,id));
     }
 
-    /**
-     * Retourne l'index de la station lier à la platform.
-     * @param id l'index de la voie ou du quai.
-     * @return l'index de la station lier a la platform.
-     * @throws IndexOutOfBoundsException si l'index est invalide.
-     */
     @Override
     public int stationId(int id) {
         return structuredBuffer.getU16(STATION_ID,id);
     }
 
-    /**
-     * Retourne la taille des donnees lier à platform.
-     * @return la taille des donnees lier à platform.
-     */
     @Override
     public int size() {
         return structuredBuffer.size();

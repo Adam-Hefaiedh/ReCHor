@@ -60,62 +60,31 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
         return data;
     }
 
-    /**
-     * Retourne les gares indexées de l'horaire.
-     *
-     * @return l'ensemble des gares.
-     */
     @Override
     public Stations stations() {
         return stations;
     }
 
-    /**
-     * Retourne les alias des gares indexées de l'horaire.
-     *
-     * @return l'ensemble des alias de gares.
-     */
     @Override
     public StationAliases stationAliases() {
         return stationAliases;
     }
 
-    /**
-     * Retourne les voies ou quais indexés de l'horaire.
-     *
-     * @return l'ensemble des voies ou quais.
-     */
     @Override
     public Platforms platforms() {
         return platforms;
     }
 
-    /**
-     * Retourne les lignes de transport public indexées de l'horaire.
-     *
-     * @return l'ensemble des lignes.
-     */
     @Override
     public Routes routes() {
         return routes;
     }
 
-    /**
-     * Retourne les changements (transferts) indexés de l'horaire.
-     *
-     * @return l'ensemble des changements.
-     */
     @Override
     public Transfers transfers() {
         return transfers;
     }
 
-    /**
-     * Retourne les courses (trips) indexées actives pour la date donnée.
-     *
-     * @param date la date considérée.
-     * @return l'ensemble des courses actives ce jour-là.
-     */
     @Override
     public Trips tripsFor(LocalDate date) {
         Path path = directory.resolve(date.toString());
@@ -128,12 +97,6 @@ public record FileTimeTable(Path directory, List<String> stringTable, Stations s
         }
     }
 
-    /**
-     * Retourne les liaisons indexées actives pour la date donnée.
-     *
-     * @param date la date considérée.
-     * @return l'ensemble des liaisons actives ce jour-là.
-     */
     @Override
     public Connections connectionsFor(LocalDate date) {
         try {

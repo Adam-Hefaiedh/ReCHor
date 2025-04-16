@@ -31,34 +31,16 @@ public final class BufferedTrips implements Trips {
 
     }
 
-    /**
-     * Retourne l'index de la ligne (route) à laquelle appartient la course d'index donné.
-     *
-     * @param id l'index de la course.
-     * @return l'index de la ligne associée à la course.
-     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à zero ou supérieur ou égal à size()).
-     */
     @Override
     public int routeId(int id) {
         return structuredBuffer.getU16(ROUTE_ID_Index,id);
     }
 
-    /**
-     * Retourne le nom de la destination finale de la course d'index donné.
-     *
-     * @param id l'index de la course.
-     * @return le nom de la destination finale de la course.
-     * @throws IndexOutOfBoundsException si l'index id est invalide (inférieur à zero ou supérieur ou égal à size()).
-     */
     @Override
     public String destination(int id) {
         return stringTable.get(structuredBuffer.getU16(DESTINATION_ID_Index,id));
     }
 
-    /**
-     * Retourne la taille des donnees lier aux courses.
-     * @return la taille des donnees lier aux courses.
-     */
     @Override
     public int size() {
         return structuredBuffer.size();

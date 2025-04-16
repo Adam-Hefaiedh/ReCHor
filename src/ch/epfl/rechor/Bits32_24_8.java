@@ -9,9 +9,9 @@ package ch.epfl.rechor;
  * @author El Hassan Lyoussi (398924).
  */
 public class Bits32_24_8 {
-    private static final int LESS_BITS = 8;
-    private static final int GREATEST_BITS = 24;
-    private static final int LESS_BITS_SIZE = 255;
+    private static final int LS_BYTE = 8;
+    private static final int GS_BYTE = 24;
+    private static final int LS_BYTE_SIZE = 255;
 
 
     private Bits32_24_8(){}
@@ -25,10 +25,10 @@ public class Bits32_24_8 {
      * @throws IllegalArgumentException si bits24 et bits8 ne sont pas de la bonne taille.
      */
     public static int pack(int bits24, int bits8){
-        Preconditions.checkArgument(bits24 >> GREATEST_BITS==0);
-        Preconditions.checkArgument(bits8 >> LESS_BITS==0);
+        Preconditions.checkArgument(bits24 >> GS_BYTE==0);
+        Preconditions.checkArgument(bits8 >> LS_BYTE==0);
 
-        return (bits24 << LESS_BITS) | bits8;
+        return (bits24 << LS_BYTE) | bits8;
     }
 
     /**
@@ -37,7 +37,7 @@ public class Bits32_24_8 {
      * @return les 24 bits de poids fort.
      */
     public static int unpack24(int bits32){
-        return bits32 >>> LESS_BITS;
+        return bits32 >>> LS_BYTE;
     }
 
     /**
@@ -46,7 +46,7 @@ public class Bits32_24_8 {
      * @return les 8 bits de poids faible.
      */
     public static int unpack8(int bits32){
-        return bits32 & LESS_BITS_SIZE;
+        return bits32 & LS_BYTE_SIZE;
     }
 
 }

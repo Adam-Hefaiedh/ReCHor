@@ -36,45 +36,23 @@ public final class BufferedStations implements Stations {
        this.stringTable = stringTable;
     }
 
-    /**
-     * Retourne le nom de la gare correspondant à l'index donné.
-     * @param id l'index de la gare.
-     * @return le nom de la gare correspondant à l'index donné.
-     * @throws IndexOutOfBoundsException si l'index id est invalide.
-     */
     @Override
     public String name(int id) {
         return stringTable.get(structuredBuffer.getU16(NAME_ID,id));
     }
 
-    /**
-     * Retourne la longitude, en degrés, de la gare correspondant à l'index donné.
-     * @param id l'index de la gare.
-     * @return la longitude de la gare.
-     * @throws IndexOutOfBoundsException si l'index id est invalide.
-     */
     @Override
     public double longitude(int id) {
         int longitude = structuredBuffer.getS32(LON,id);
         return longitude*CONVERSION;
     }
 
-    /**
-     * Retourne la latitude, en degrés, de la gare correspondant à l'index donné.
-     * @param id l'index de la gare.
-     * @return la latitude de la gare.
-     * @throws IndexOutOfBoundsException si l'index id est invalide.
-     */
     @Override
     public double latitude(int id) {
         int latitude = structuredBuffer.getS32(LAT,id);
         return latitude*CONVERSION;
     }
 
-    /**
-     * Retourne la taille de tableau de donnee lier à la station.
-     * @return la taille de tableau de donnee lier à la station.
-     */
     @Override
     public int size() {
         return structuredBuffer.size();

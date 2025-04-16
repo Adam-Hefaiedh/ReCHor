@@ -31,32 +31,16 @@ public final class BufferedStationAliases implements StationAliases {
         this.stringTable = stringTable;
     }
 
-    /**
-     * Retourne le nom alternatif de la gare pour l'index donné.
-     * @param id l'index du nom alternatif.
-     * @return le nom alternatif de la gare pour l'index donné.
-     * @throws IndexOutOfBoundsException si l'index id est invalide.
-     */
     @Override
     public String alias(int id) {
         return stringTable.get(structuredBuffer.getU16(ALIAS_ID,id));
     }
 
-    /**
-     * Retourne le nom officiel de la gare correspondant à l'alias d'index donné.
-     * @param id l'index du nom alternatif.
-     * @return le nom officiel de la gare correspondant à l'alias d'index donné.
-     * @throws IndexOutOfBoundsException si l'index id est invalide.
-     */
     @Override
     public String stationName(int id) {
         return stringTable.get(structuredBuffer.getU16(STATION_NAME_ID,id));
     }
 
-    /**
-     * Retourne la taille de tableau de donnee lier à l'alias de station.
-     * @return la taille de tableau de donnee lier à l'alias de station.
-     */
     @Override
     public int size() {
         return structuredBuffer.size();
