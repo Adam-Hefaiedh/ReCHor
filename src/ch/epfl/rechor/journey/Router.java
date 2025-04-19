@@ -8,14 +8,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public record Router(TimeTable timeTable) {
 
     public static void main(String[] args) throws  IOException {
         long tStart = System.nanoTime();
 
-        TimeTable timeTable = FileTimeTable.in(Path.of("timetable"));
+        TimeTable timeTable = new CachedTimeTable(FileTimeTable.in(Path.of("timetable")));
         Stations stations = timeTable.stations();
         LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
         int depStationId = 7862;
@@ -44,11 +46,14 @@ public record Router(TimeTable timeTable) {
         {
             timeTransfers[transfers.depStationId(i)] = transfers.minutes(i);
         }
+
         for(int i=0; i< allConnection.size(); i++){
             ParetoFront.Builder paretoBuild = new ParetoFront.Builder();
             if(timeTransfers[timeTable.stationId(allConnection.arrStopId(i))] != -1)
             {
-                paretoBuild.add(allConnection.arrMins(i) + timeTransfers[timeTable.stationId(allConnection.arrStopId(i))],0,0);
+
+                paretoBuild.add(allConnection.arrMins(i) + timeTransfers[timeTable.stationId(allConnection.arrStopId(i))],0,i);
+
             }
             if(profileBuild.forTrip(allConnection.tripId(i)) != null) {
                 paretoBuild.addAll(profileBuild.forTrip(allConnection.tripId(i)));
@@ -61,22 +66,33 @@ public record Router(TimeTable timeTable) {
                             int depTime = PackedCriteria.depMins(t);
                             int arrTime = allConnection.arrMins(finalI);
                             if( depTime >= arrTime) {
-                                paretoBuild.add(PackedCriteria.withAdditionalChange(PackedCriteria.withoutDepMins(t)));
+                                //paretoBuild.add(PackedCriteria.withAdditionalChange(PackedCriteria.withoutDepMins(t)));
+                                paretoBuild.add(PackedCriteria.arrMins(t), PackedCriteria.changes(t) + 1, finalI);
                             }
                         }
                 );
             }
-            if(profileBuild.forTrip(allConnection.tripId(i)) == null)profileBuild.setForTrip(allConnection.tripId(i),paretoBuild);
+            //MISE A JOUR 1
+            if (paretoBuild.isEmpty()) continue;
+            else if (profileBuild.forTrip(allConnection.tripId(i)) == null) {profileBuild.setForTrip(allConnection.tripId(i),paretoBuild);}
             else profileBuild.forTrip(allConnection.tripId(i)).addAll(paretoBuild);
 
             int inter = transfers.arrivingAt(timeTable.stationId(allConnection.depStopId(i)));
-            for(int j= PackedRange.startInclusive(inter); j <PackedRange.endExclusive(inter); j++)
+            for(int j = PackedRange.startInclusive(inter); j <PackedRange.endExclusive(inter); j++)
             {
                 int d = allConnection.depMins(i) - transfers.minutes(j);
                 ParetoFront.Builder paretoBuildWithDep = new ParetoFront.Builder();
-                paretoBuild.forEach((t) -> paretoBuildWithDep.add(PackedCriteria.withDepMins(t,d)));
-                if(profileBuild.forStation(transfers.depStationId(j)) == null) profileBuild.setForStation(transfers.depStationId(j), paretoBuildWithDep);
-                else profileBuild.forStation(transfers.depStationId(j)).addAll( paretoBuildWithDep);
+                //MISE A JOUR 2
+                if (paretoBuild.isEmpty()) continue;
+                else {paretoBuild.forEach((t) -> {
+                    int associatedInformation = PackedCriteria.payload(t)<<16 |  - finalI;//il manque la position dans la course,
+                    // de la liason a laquelle il faut descendre de la course.
+                    long tWithPayload = PackedCriteria.withPayload(t, associatedInformation);
+                    paretoBuildWithDep.add(PackedCriteria.withDepMins(tWithPayload, d));
+                });
+                    if(profileBuild.forStation(transfers.depStationId(j)) == null) profileBuild.setForStation(transfers.depStationId(j), paretoBuildWithDep);
+                    else profileBuild.forStation(transfers.depStationId(j)).addAll(paretoBuildWithDep);
+                    }
             }
         }
 
