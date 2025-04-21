@@ -1,10 +1,13 @@
 package ch.epfl.rechor.timetable;
 
+import ch.epfl.rechor.timetable.mapped.FileTimeTable;
+
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 
 public class CachedTimeTable implements TimeTable{
 
-    private LocalDate date;
+    private LocalDate date = null;
     private final TimeTable underlyingTimeTable;
     private Connections cachedConnection = null;
     private Trips cachedTrip = null;
@@ -44,6 +47,7 @@ public class CachedTimeTable implements TimeTable{
         if (this.date != date) {
             this.date = date;
             cachedTrip = underlyingTimeTable.tripsFor(date);
+            cachedConnection = underlyingTimeTable.connectionsFor(date);
         }
         return cachedTrip;
     }
@@ -53,6 +57,7 @@ public class CachedTimeTable implements TimeTable{
         if (this.date != date){
             this.date = date;
             cachedConnection = underlyingTimeTable.connectionsFor(date);
+            cachedTrip = underlyingTimeTable.tripsFor(date);
         }
         return cachedConnection;
     }

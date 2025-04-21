@@ -26,7 +26,7 @@ public class JourneyIcalConverter {
      * @param journey l'objet Journey contenant les informations du voyage.
      * @return la chaîne iCalendar générée.
      */
-    public static String toIcalendar(Journey journey) {
+    public static String toIcalendar( Journey journey) {
 
 
         StringJoiner j = new StringJoiner("\\n");
@@ -34,7 +34,7 @@ public class JourneyIcalConverter {
 
         for (Journey.Leg leg : journey.legs()) {
             switch(leg) {
-                case Journey.Leg.Foot f ->
+                case  Journey.Leg.Foot f ->
                         j.add(FormatterFr.formatLeg(f));
                 case Journey.Leg.Transport t ->
                         j.add(FormatterFr.formatLeg(t));

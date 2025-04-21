@@ -11,19 +11,24 @@ import static java.lang.Integer.toUnsignedLong;
  * @author El Hassan Lyoussi (398924).
  */
 public class PackedCriteria {
+
     private static final int MINIMUM_HOURS      = -240;
     private static final int MAXIMUM_HOURS      = 2880;
     private static final int MAX_BIT_CHANGE     = 32;
     private static final int MAX_BIT_DEPART     = 51;
     private static final int MAX_BIT_ARR        = 39;
     private static final int MAX_HOURS_POSSIBLE = 4095;
-    private static final long NO_DEPART         = 0x1FFFFFFFFFFFFL;
+    private static final long NO_DEPART         = -1L >>> 13;
     private static final int CHANGES_POSITION   = 7;
     private static final int CHANGES_SIZE       = 127;
     private static final long ADD_CHANGES       = 1L;
     private static final long NO_PAYLOAD        = ~(0xFFFFFFFFL);
 
-    private PackedCriteria(){}
+
+    /**
+     * Constructeur privé pour empêcher l'instanciation.
+     */
+    private PackedCriteria() {}
 
     /**
      * Retourne la valeur de type long résultant de l'empaquetage de l'heure d'arrivée,
@@ -63,10 +68,10 @@ public class PackedCriteria {
     public static int depMins(long criteria){
         Preconditions.checkArgument(hasDepMins(criteria));
 
-        return MAX_HOURS_POSSIBLE - (int)(criteria >>>  MAX_BIT_DEPART) + MINIMUM_HOURS;
+        return MAX_HOURS_POSSIBLE - (int)(criteria >>  MAX_BIT_DEPART) + MINIMUM_HOURS;
     }
 
-    /**
+     /**
      * Retourne l'heure d'arrivée (en minutes après minuit)
      * des critères empaquetés donnés.
      * @param criteria Les critères empaquetés.
@@ -75,7 +80,7 @@ public class PackedCriteria {
     public static int arrMins(long criteria)
     {
 
-        return (int)(criteria >>> MAX_BIT_ARR & MAX_HOURS_POSSIBLE) + MINIMUM_HOURS;
+        return (int)(criteria >> MAX_BIT_ARR & MAX_HOURS_POSSIBLE) + MINIMUM_HOURS;
     }
 
     /**
@@ -110,13 +115,14 @@ public class PackedCriteria {
 
         if(hasDepMins(criteria1))
         {
-           return depMins(criteria1) >= depMins(criteria2) && arrMins(criteria1) <=
-                   arrMins(criteria2) && changes(criteria1) <= changes(criteria2);
+            return depMins(criteria1) >= depMins(criteria2) && arrMins(criteria1) <=
+                    arrMins(criteria2) && changes(criteria1) <= changes(criteria2);
         }
         else {
             return arrMins(criteria1) <= arrMins(criteria2) && changes(criteria1) <= changes(criteria2);
         }
     }
+
 
     /**
      * Retourne des critères empaquetés identiques à ceux donnés, mais sans heure de départ.
@@ -126,6 +132,7 @@ public class PackedCriteria {
     public static long withoutDepMins(long criteria){
         return criteria & NO_DEPART;
     }
+
 
     /**
      * Retourne des critères empaquetés identiques à ceux donnés, mais avec l'heure de départ donnée.
