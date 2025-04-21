@@ -18,7 +18,7 @@ public class PackedCriteria {
     private static final int MAX_BIT_DEPART     = 51;
     private static final int MAX_BIT_ARR        = 39;
     private static final int MAX_HOURS_POSSIBLE = 4095;
-    private static final long NO_DEPART         = -1L >>> 13;
+    private static final long NO_DEPART         = 0x7FFFFFFFFFFFFL;
     private static final int CHANGES_POSITION   = 7;
     private static final int CHANGES_SIZE       = 127;
     private static final long ADD_CHANGES       = 1L;
