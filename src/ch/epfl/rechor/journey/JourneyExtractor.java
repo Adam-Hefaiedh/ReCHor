@@ -112,8 +112,6 @@ public class JourneyExtractor {
         int station2 = timeTable.stationId(depStationId);
         Stop depStop = createStop(stations,  timeTable, depStationId);
         Stop arrStop = createStop(stations, timeTable, arrStationId);
-        System.out.println(timeTable.stations().name(station));
-        System.out.println(timeTable.stations().name(station2));
         LocalDateTime arrTime = formatDate(date, depHour
                 + transfers.minutesBetween(station2, station));
         LocalDateTime depTime = formatDate(date, depHour);

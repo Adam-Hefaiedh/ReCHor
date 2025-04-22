@@ -15,26 +15,6 @@ import java.util.List;
 
 public record Router(TimeTable timeTable) {
 
-    public static void main(String[] args) throws  IOException {
-        long tStart = System.nanoTime();
-
-        TimeTable timeTable = new CachedTimeTable(FileTimeTable.in(Path.of("timetable")));
-        Stations stations = timeTable.stations();
-        LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
-        int depStationId = 7862;
-        int arrStationId = 11440;
-        Router router = new Router(timeTable);
-        Profile profile = router.profile(date, arrStationId);
-        Journey journey = JourneyExtractor
-                .journeys(profile, depStationId)
-                .get(32);
-        System.out.println(JourneyIcalConverter.toIcalendar(journey));
-
-        double elapsed = (System.nanoTime() - tStart) * 1e-9;
-        System.out.printf("Temps écoulé : %.3f s%n", elapsed);
-    }
-
-
     public Profile profile(LocalDate date, int arrStationId)
     {
         Profile.Builder profileBuild = new Profile.Builder(timeTable,date,arrStationId);
