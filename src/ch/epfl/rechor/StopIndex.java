@@ -34,7 +34,7 @@ public class StopIndex {
         this.stations = List.copyOf(list);
     }
 
-
+    
     public List<String> stopsMatching (String query, int maxStopNumber) {
 
         Pattern ER = Pattern.compile(" ");
@@ -44,8 +44,7 @@ public class StopIndex {
                 .map(this::SubQueryToRegularExpression)
                 .toArray(Pattern[]::new);
 
-
-        var scored = new ArrayList<Scored>();
+        List<Scored> scored = new ArrayList<>();
         for (StopNames st : stations) {
             String src = st.source();
             boolean allMatch = true;
