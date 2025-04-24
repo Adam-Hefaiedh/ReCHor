@@ -10,10 +10,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class JourneyGeoJsonConverter {
     private JourneyGeoJsonConverter(){}
@@ -36,30 +34,31 @@ public class JourneyGeoJsonConverter {
         System.out.println(JourneyGeoJsonConverter.toGeoJSON(journey));
 
         double elapsed = (System.nanoTime() - tStart) * 1e-9;
-        System.out.printf("Temps écoulé : %.3f s%n", elapsed);
     }
 
     public static Json toGeoJSON(Journey journey)
     {
         List<Json> ride = new ArrayList<>();
-        journey.legs().forEach((l) ->{
-            List<Json> coordinate = new ArrayList<>();
+        List<Journey.Leg> steps = journey.legs();
+        steps.forEach((l) ->{
+            ArrayList<Json> coordinate= new ArrayList<>();
             coordinate.add(new Json.JNumber(l.depStop().longitude()));
             coordinate.add(new Json.JNumber(l.depStop().latitude()));
             ride.add(new Json.JArray(coordinate));
-            coordinate.clear();
             l.intermediateStops().forEach((i) -> {
-                coordinate.add(new Json.JNumber(i.stop().longitude()));
-                coordinate.add(new Json.JNumber(i.stop().latitude()));
-                ride.add(new Json.JArray(coordinate));
-                coordinate.clear();
+                ArrayList<Json> subCoordinate = new ArrayList<>();
+                subCoordinate.add(new Json.JNumber(i.stop().longitude()));
+                subCoordinate.add(new Json.JNumber(i.stop().latitude()));
+                ride.add(new Json.JArray(subCoordinate));
             });
-            coordinate.add(new Json.JNumber(l.arrStop().longitude()));
-            coordinate.add(new Json.JNumber(l.arrStop().latitude()));
-            ride.add(new Json.JArray(coordinate));
         });
-        Map<String, Json> geoJson = Map.of("type", new Json.JString("LineString"),
-                "coordinates", new Json.JArray(ride));
+        ArrayList<Json> coordinate= new ArrayList<>();
+        coordinate.add(new Json.JNumber(steps.getLast().arrStop().longitude()));
+        coordinate.add(new Json.JNumber(steps.getLast().arrStop().latitude()));
+        ride.add(new Json.JArray(coordinate));
+        Map<String, Json> geoJson = new LinkedHashMap<>();
+        geoJson.put("type", new Json.JString("LineString"));
+        geoJson.put("coordinates", new Json.JArray(ride));
         return new Json.JObject(geoJson);
     }
 }
