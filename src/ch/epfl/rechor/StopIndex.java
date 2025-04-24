@@ -21,20 +21,20 @@ public class StopIndex {
 
     private final List<StopNames> stations;
 
-    public StopIndex(List<String> stopIndex, Map<String, String> principalName){
+    public StopIndex(List<String> stopIndex, Map<String, String> aliases){
         List<StopNames> list = new ArrayList<>();
 
         for (String name : stopIndex) {
             list.add(new StopNames(name, name));
         }
 
-        for (Map.Entry<String, String> entry : principalName.entrySet()) {
+        for (Map.Entry<String, String> entry : aliases.entrySet()) {
             list.add(new StopNames(entry.getKey(), entry.getValue()));
         }
         this.stations = List.copyOf(list);
     }
 
-    
+
     public List<String> stopsMatching (String query, int maxStopNumber) {
 
         Pattern ER = Pattern.compile(" ");
