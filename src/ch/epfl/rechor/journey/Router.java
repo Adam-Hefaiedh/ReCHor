@@ -15,6 +15,35 @@ import java.util.List;
 
 public record Router(TimeTable timeTable) {
 
+    static int stationId(Stations stations, String stationName) {
+        for(int i=0; i<stations.size(); i++){
+            if(stations.name(i).equals(stationName)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) throws IOException {
+        long tStart = System.nanoTime();
+
+        TimeTable timeTable =
+                new CachedTimeTable(FileTimeTable.in(Path.of("timetable")));
+        Stations stations = timeTable.stations();
+        LocalDate date = LocalDate.of(2025, Month.APRIL, 1);
+        int depStationId = stationId(stations, "Ecublens VD, EPFL");
+        int arrStationId = stationId(stations, "Gruyères");
+        Router router = new Router(timeTable);
+        Profile profile = router.profile(date, arrStationId);
+        Journey journey = JourneyExtractor
+                .journeys(profile, depStationId)
+                .get(32);
+        System.out.println(JourneyIcalConverter.toIcalendar(journey));
+
+        double elapsed = (System.nanoTime() - tStart) * 1e-9;
+        System.out.printf("Temps écoulé : %.3f s%n", elapsed);
+    }
+
     public Profile profile(LocalDate date, int arrStationId)
     {
         Profile.Builder profileBuild = new Profile.Builder(timeTable,date,arrStationId);
@@ -35,7 +64,7 @@ public record Router(TimeTable timeTable) {
             if(timeTransfers[arrStation] != -1)
             {
 
-                paretoBuild.add(allConnection.arrMins(i) + timeTransfers[arrStation],0,i);
+                paretoBuild.add(allConnection.arrMins(i) + timeTransfers[arrStation],0,Bits32_24_8.pack(i,0));
 
             }
             if(profileBuild.forTrip(allConnection.tripId(i)) != null) {
@@ -49,8 +78,8 @@ public record Router(TimeTable timeTable) {
                             int depTime = PackedCriteria.depMins(t);
                             int arrTime = allConnection.arrMins(finalI);
                             if( depTime >= arrTime) {
-                                //paretoBuild.add(PackedCriteria.withAdditionalChange(PackedCriteria.withoutDepMins(t)));
-                                paretoBuild.add(PackedCriteria.arrMins(t), PackedCriteria.changes(t) + 1, finalI);
+                                paretoBuild.add(PackedCriteria.withoutDepMins(
+                              PackedCriteria.withAdditionalChange(PackedCriteria.withPayload(t,Bits32_24_8.pack(finalI,0)))));
                             }
                         }
                 );
@@ -68,7 +97,9 @@ public record Router(TimeTable timeTable) {
                         ParetoFront.Builder paretoBuildWithDep = new ParetoFront.Builder();
                         //MISE A JOUR 2
                             paretoBuild.forEach((t) -> {
-                                int associatedInformation = Bits32_24_8.pack(finalI, allConnection.tripPos(PackedCriteria.payload(t)) - allConnection.tripPos(finalI));//il manque la position dans la course,
+                                int associatedInformation = Bits32_24_8.pack(finalI,
+                                        allConnection.tripPos(Bits32_24_8.unpack24(PackedCriteria.payload(t)))
+                                                - allConnection.tripPos(finalI));//il manque la position dans la course,
                                 // de la liason a laquelle il faut descendre de la course.
                                 long tWithPayload = PackedCriteria.withPayload(t, associatedInformation);
                                 paretoBuildWithDep.add(PackedCriteria.withDepMins(tWithPayload, d));
