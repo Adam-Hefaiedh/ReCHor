@@ -16,8 +16,8 @@ public class StopIndex {
             'u', "uúùûü"
     );
 
-    private static record StopNames(String source, String principal) {}
-    private static record Scored(String name, int score) {}
+    private record StopNames(String source, String principal) {}
+    private record Scored(String name, int score) {}
 
     private final List<StopNames> stations;
 
