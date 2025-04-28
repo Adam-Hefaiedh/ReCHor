@@ -18,12 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class JourneyGeoJsonConverter {
     private JourneyGeoJsonConverter(){}
 
-    public static Json toGeoJSON(Journey journey)
-    {
+    public static Json toGeoJSON (Journey journey) {
         List<Json> ride = new ArrayList<>();
         List<Journey.Leg> steps = journey.legs();
-        steps.forEach((l) ->{
-            ArrayList<Json> coordinate= new ArrayList<>();
+        steps.forEach((l) -> {
+            ArrayList<Json> coordinate = new ArrayList<>();
             coordinate.add(new Json.JNumber(l.depStop().longitude()));
             coordinate.add(new Json.JNumber(l.depStop().latitude()));
             ride.add(new Json.JArray(coordinate));
@@ -32,9 +31,9 @@ public class JourneyGeoJsonConverter {
                 subCoordinate.add(new Json.JNumber(i.stop().longitude()));
                 subCoordinate.add(new Json.JNumber(i.stop().latitude()));
                 ride.add(new Json.JArray(subCoordinate));
-            });
+                });
         });
-        ArrayList<Json> coordinate= new ArrayList<>();
+        ArrayList<Json> coordinate = new ArrayList<>();
         coordinate.add(new Json.JNumber(steps.getLast().arrStop().longitude()));
         coordinate.add(new Json.JNumber(steps.getLast().arrStop().latitude()));
         ride.add(new Json.JArray(coordinate));
