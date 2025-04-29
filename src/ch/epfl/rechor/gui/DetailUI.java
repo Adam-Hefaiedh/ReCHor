@@ -9,60 +9,69 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public record DetailUI (Node rootNode) {
 
     public static DetailUI create(ObservableValue<Journey> journey) {
+        ScrollPane detailPane = new ScrollPane();
+        detailPane.setId("detail");
+        detailPane.getStylesheets().add("detail.css");
 
         Label noneLabel = new Label("Aucun voyage");
         VBox vBox1 = new VBox(noneLabel);
         vBox1.setId("no-journey");
-        StackPane nonePane = new StackPane(noneLabel);
-        nonePane.setAlignment(Pos.CENTER);
 
         GridPane stepsPane = createStepsPane(journey);
         stepsPane.setId("legs");
-        stepsPane.setVisible(false);
 
+        
+
+        StackPane stackPane1 = new StackPane(stepsPane);
         Button map = new Button("Carte");
         Button calendar = new Button("Calendrier");
         HBox buttonBar = new HBox(2, map, calendar);
         buttonBar.setId("buttons");
         buttonBar.setAlignment(Pos.CENTER_RIGHT);
-        VBox vbox2 = new VBox(5, buttonBar, stepsPane);
+        VBox vbox2 = new VBox(5, stackPane1, buttonBar);
 
-        BorderPane root = new BorderPane();
-        root.setCenter(nonePane);
-        root.setBottom(buttonBar);
+        StackPane stackPane = new StackPane(vBox1, vbox2);
 
-
-        journey.addListener((observableValue, oldJourney, newJourney) -> {
-            if (newJourney == null) root.setCenter(nonePane);
-            else { stepsPane.setVisible(true);
-                root.setCenter(stepsPane);}
-        });
-        return new DetailUI(root);
+        Journey currentJourney = journey.getValue();
+        if (currentJourney != null) {
+            vbox2.setVisible(true);
+            vBox1.setVisible(false);
+        } else {
+            vbox2.setVisible(false);
+            vBox1.setVisible(true);
+        }
+        detailPane.setContent(stackPane);
+        return new DetailUI(detailPane);
     }
 
     private static GridPane createStepsPane(ObservableValue<Journey> journey) {
 
-        GridPane stepsPane = new GridPane();
+        circleGridPane stepsPane = new circleGridPane();
         List<Journey.Leg> steps = journey.getValue().legs();
-
         AtomicInteger rowIndex= new AtomicInteger(0);
         steps.forEach((l) -> {
 
             if (l instanceof Journey.Leg.Foot){
-                Text transfer = new Text(FormatterFr.formatLeg(l));//je comprends pas,pourquoi ca ne prend pas une instance de foot?
+                Text transfer = new Text(FormatterFr.formatLeg((Journey.Leg.Foot) l));
                 stepsPane.add(transfer, 2, rowIndex.get(), 2, 1);
-                GridPane.setHalignment(transfer, HPos.LEFT);
                 rowIndex.getAndIncrement();
             }
 
@@ -71,28 +80,31 @@ public record DetailUI (Node rootNode) {
                 //ligne 1
                 Text depTime = new Text(FormatterFr.formatTime(l.depTime()));
                 Circle circle = new Circle(3);
-                Text depStop = new Text(l.depStop().toString());
-                Text depPlatform; //je n'arrive pas a trouver le nom du quai
-                stepsPane.add(depTime,      0, rowIndex.get()); GridPane.setHalignment(depTime, HPos.RIGHT);
-                stepsPane.add(circle,           1, rowIndex.get()); GridPane.setHalignment(circle, HPos.CENTER);
-                stepsPane.add(depStop,   2, rowIndex.get()); GridPane.setHalignment(depStop, HPos.LEFT);
-                stepsPane.add(depPlatform,  3, rowIndex.get()); GridPane.setHalignment(depPlatform, HPos.LEFT);
+                Text depStop = new Text(l.depStop().name());
+                Text depPlatform = new Text(FormatterFr.formatPlatformName(l.depStop()));
+                depPlatform.getStyleClass().add("departure");
+                depTime.getStyleClass().add("departure");
+                stepsPane.add(depTime,      0, rowIndex.get());
+                stepsPane.add(circle,           1, rowIndex.get());
+                stepsPane.add(depStop,   2, rowIndex.get());
+                stepsPane.add(depPlatform,  3, rowIndex.get());
                 rowIndex.getAndIncrement();
 
                 //ligne 2
-                ImageView vehicleImage = new ImageView(((Journey.Leg.Transport) l).vehicle().toString() + ".png");
+                ImageView vehicleImage = new ImageView(VehicleIcons.IconFor(((Journey.Leg.Transport) l).vehicle()));
                 vehicleImage.setFitWidth(31);
                 vehicleImage.setFitHeight(31);
                 vehicleImage.setPreserveRatio(true);
-                Text routeDest = new Text(FormatterFr.formatRouteDestination(l));
-                stepsPane.add(vehicleImage, 0, rowIndex.get(), 1, 2);
+                Text routeDest = new Text(FormatterFr.formatRouteDestination((Journey.Leg.Transport)l));
                 GridPane.setValignment(vehicleImage, VPos.CENTER);
                 stepsPane.add(routeDest, 2, rowIndex.get(), 2, 1);
                 GridPane.setHalignment(routeDest, HPos.LEFT);
-                rowIndex.getAndIncrement();
 
                 //ligne 3
                 if (!l.intermediateStops().isEmpty()) {
+                    stepsPane.add(vehicleImage, 0, rowIndex.get(), 1, 2);
+                    GridPane.setValignment(vehicleImage, VPos.CENTER);
+                    rowIndex.getAndIncrement();
                     Accordion interStops = new Accordion();
                     TitledPane titledPane = new TitledPane();
                     titledPane.setText(l.intermediateStops().size() + " arrêts, " + FormatterFr.formatDuration(l.duration()));
@@ -102,10 +114,10 @@ public record DetailUI (Node rootNode) {
                     interStopsGrid.setVgap(2);
                     AtomicInteger rowIndex2 = new AtomicInteger();
                     l.intermediateStops().forEach((i) -> {
-                        interStopsGrid.add(new Text(FormatterFr.formatTime(i.depTime())), 0, rowIndex2.get());
-                        interStopsGrid.add(new Text(FormatterFr.formatTime(i.arrTime())), 1, rowIndex2.get());
-                        interStopsGrid.add(new Text(i.stop().toString()), 2, rowIndex2.get());
-                    rowIndex2.getAndIncrement();
+                        interStopsGrid.add(new Text(FormatterFr.formatTime(i.arrTime())), 0, rowIndex2.get());
+                        interStopsGrid.add(new Text(FormatterFr.formatTime(i.depTime())), 1, rowIndex2.get());
+                        interStopsGrid.add(new Text(i.stop().name()), 2, rowIndex2.get());
+                        rowIndex2.getAndIncrement();
                     });
 
                     titledPane.setContent(interStopsGrid);
@@ -113,20 +125,59 @@ public record DetailUI (Node rootNode) {
                     stepsPane.add(interStops, 2, rowIndex.get(), 2, 1);
                     rowIndex.getAndIncrement();
                 }
-
+                else {
+                    stepsPane.add(vehicleImage, 0, rowIndex.get(), 1, 1);
+                    GridPane.setValignment(vehicleImage, VPos.CENTER);
+                    rowIndex.getAndIncrement();
+                }
 
                 //ligne 4
                 Text arrTime = new Text(FormatterFr.formatTime(l.arrTime()));
                 Circle circle1 = new Circle(3);
-                Text arrStop = new Text(l.arrStop().toString());
-                Text arrPlatform; // je ne sais pas comment l'avoir
-                stepsPane.add(arrTime,      0, rowIndex.get()); GridPane.setHalignment(depTime, HPos.RIGHT);
-                stepsPane.add(circle1,           1, rowIndex.get()); GridPane.setHalignment(circle, HPos.CENTER);
-                stepsPane.add(arrStop,   2, rowIndex.get()); GridPane.setHalignment(depStop, HPos.LEFT);
-                stepsPane.add(arrPlatform,  3, rowIndex.get()); GridPane.setHalignment(depPlatform, HPos.LEFT);
+                Text arrStop = new Text(l.arrStop().name());
+                Text arrPlatform = new Text(FormatterFr.formatPlatformName(l.arrStop()));
+                stepsPane.add(arrTime,      0, rowIndex.get()); GridPane.setHalignment(arrTime, HPos.RIGHT);
+                stepsPane.add(circle1,           1, rowIndex.get()); GridPane.setHalignment(circle1, HPos.CENTER);
+                stepsPane.add(arrStop,   2, rowIndex.get()); GridPane.setHalignment(arrStop, HPos.LEFT);
+                stepsPane.add(arrPlatform,  3, rowIndex.get()); GridPane.setHalignment(arrPlatform, HPos.LEFT);
+                stepsPane.addCirclePair(circle,circle1);
+                rowIndex.getAndIncrement();
             }
         });
+
         return stepsPane;
+    }
+
+    private static class circleGridPane extends GridPane {
+
+
+        private final List<Pair<Circle, Circle>> circlePairs = new ArrayList<>();
+
+        public void addCirclePair(Circle depCircle, Circle arrCircle) {
+            circlePairs.add(new Pair<>(depCircle, arrCircle));
+        }
+
+        @Override
+        protected void layoutChildren() {
+            getChildren().removeIf(node -> node instanceof Line);
+
+            super.layoutChildren();
+            for (Pair<Circle, Circle> pair : circlePairs) {
+                Circle depCircle = pair.getKey();
+                Circle arrCircle = pair.getValue();
+
+                double startX = depCircle.getBoundsInParent().getCenterX();
+                double startY = depCircle.getBoundsInParent().getCenterY();
+                double endX = arrCircle.getBoundsInParent().getCenterX();
+                double endY = arrCircle.getBoundsInParent().getCenterY();
+
+                Line line = new Line(startX, startY, endX, endY);
+                line.setStroke(Color.RED);
+                line.setStrokeWidth(2);
+
+                getChildren().addFirst(line);
+            }
+        }
     }
 }
 

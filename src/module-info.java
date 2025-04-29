@@ -1,7 +1,7 @@
 module ReCHor {
     requires javafx.controls;
-    requires java.desktop;
     requires java.net.http;
+    requires jdk.unsupported.desktop;
 
     exports ch.epfl.rechor;
     exports ch.epfl.rechor.timetable;
