@@ -79,7 +79,7 @@ public record DetailUI (Node rootNode) {
         map.setOnAction(event -> {
             URI link = null;
             try {
-                link = new URI("https://","umap.osm.ch","/fr/map", "data="+ JourneyGeoJsonConverter.toGeoJSON(journey.getValue()), null);
+                link = new URI("https","umap.osm.ch","/fr/map", "data="+ JourneyGeoJsonConverter.toGeoJSON(journey.getValue()), null);
                 Desktop.getDesktop().browse(link);
             } catch (URISyntaxException | IOException e) {
                 throw new RuntimeException(e);
