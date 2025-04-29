@@ -41,7 +41,7 @@ public record DetailUI (Node rootNode) {
         vBox1.setId("no-journey");
         List<Pair<Circle,Circle>> circles = new ArrayList<>();
 
-        GridPane stepsPane = createStepsPane(journey, circles);
+        GridPane stepsPane = createStepsPane(journey.getValue(), circles);
         stepsPane.setId("legs");
 
         Pane Annotation = new Pane(){
@@ -83,7 +83,6 @@ public record DetailUI (Node rootNode) {
         Button calendar = new Button("Calendrier");
         HBox buttonBar = new HBox(2, map, calendar);
         buttonBar.setId("buttons");
-        buttonBar.setAlignment(Pos.CENTER_RIGHT);
         VBox vbox2 = new VBox(5, stackPane1, buttonBar);
 
         StackPane stackPane = new StackPane(vBox1, vbox2);
@@ -100,10 +99,11 @@ public record DetailUI (Node rootNode) {
         return new DetailUI(detailPane);
     }
 
-    private static GridPane createStepsPane(ObservableValue<Journey> journey, List<Pair<Circle,Circle>> circles) {
+    private static GridPane createStepsPane(Journey journey, List<Pair<Circle,Circle>> circles) {
 
         GridPane stepsPane = new GridPane();
-        List<Journey.Leg> steps = journey.getValue().legs();
+        List<Journey.Leg> steps = new ArrayList<>();
+        if(journey != null)  steps = journey.legs();
         AtomicInteger rowIndex= new AtomicInteger(0);
         steps.forEach((l) -> {
 
@@ -134,14 +134,11 @@ public record DetailUI (Node rootNode) {
                 vehicleImage.setFitHeight(31);
                 vehicleImage.setPreserveRatio(true);
                 Text routeDest = new Text(FormatterFr.formatRouteDestination((Journey.Leg.Transport)l));
-                GridPane.setValignment(vehicleImage, VPos.CENTER);
                 stepsPane.add(routeDest, 2, rowIndex.get(), 2, 1);
-                GridPane.setHalignment(routeDest, HPos.LEFT);
 
                 //ligne 3
                 if (!l.intermediateStops().isEmpty()) {
                     stepsPane.add(vehicleImage, 0, rowIndex.get(), 1, 2);
-                    GridPane.setValignment(vehicleImage, VPos.CENTER);
                     rowIndex.getAndIncrement();
                     Accordion interStops = new Accordion();
                     TitledPane titledPane = new TitledPane();
@@ -165,7 +162,6 @@ public record DetailUI (Node rootNode) {
                 }
                 else {
                     stepsPane.add(vehicleImage, 0, rowIndex.get(), 1, 1);
-                    GridPane.setValignment(vehicleImage, VPos.CENTER);
                     rowIndex.getAndIncrement();
                 }
 
@@ -174,10 +170,10 @@ public record DetailUI (Node rootNode) {
                 Circle circle1 = new Circle(3);
                 Text arrStop = new Text(l.arrStop().name());
                 Text arrPlatform = new Text(FormatterFr.formatPlatformName(l.arrStop()));
-                stepsPane.add(arrTime,      0, rowIndex.get()); GridPane.setHalignment(arrTime, HPos.RIGHT);
-                stepsPane.add(circle1,           1, rowIndex.get()); GridPane.setHalignment(circle1, HPos.CENTER);
-                stepsPane.add(arrStop,   2, rowIndex.get()); GridPane.setHalignment(arrStop, HPos.LEFT);
-                stepsPane.add(arrPlatform,  3, rowIndex.get()); GridPane.setHalignment(arrPlatform, HPos.LEFT);
+                stepsPane.add(arrTime,      0, rowIndex.get());
+                stepsPane.add(circle1,           1, rowIndex.get());
+                stepsPane.add(arrStop,   2, rowIndex.get());
+                stepsPane.add(arrPlatform,  3, rowIndex.get());
                 circles.add(new Pair<>(circle,circle1));
                 rowIndex.getAndIncrement();
             }
