@@ -4,6 +4,7 @@ package ch.epfl.rechor.gui;
 import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
 import ch.epfl.rechor.journey.JourneyGeoJsonConverter;
+import ch.epfl.rechor.journey.JourneyIcalConverter;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -19,12 +20,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.util.Pair;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -80,7 +85,21 @@ public record DetailUI (Node rootNode) {
                 throw new RuntimeException(e);
             }
         });
+
         Button calendar = new Button("Calendrier");
+        calendar.setOnAction(event -> {
+            try {
+                FileChooser file = new FileChooser();
+                file.setTitle("format iCalendar");
+                file.setInitialFileName("voyage_" + FormatterFr.formatTime(journey.getValue().depTime()) + ".ics");
+
+                File selectedFile = file.showSaveDialog(calendar.getScene().getWindow());
+                Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(journey.getValue()));
+            } catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        });
+
         HBox buttonBar = new HBox(2, map, calendar);
         buttonBar.setId("buttons");
         VBox vbox2 = new VBox(5, stackPane1, buttonBar);
