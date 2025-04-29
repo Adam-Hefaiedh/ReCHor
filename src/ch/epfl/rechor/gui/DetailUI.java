@@ -34,13 +34,37 @@ public record DetailUI (Node rootNode) {
         Label noneLabel = new Label("Aucun voyage");
         VBox vBox1 = new VBox(noneLabel);
         vBox1.setId("no-journey");
+        List<Pair<Circle,Circle>> circles = new ArrayList<>();
 
-        GridPane stepsPane = createStepsPane(journey);
+        GridPane stepsPane = createStepsPane(journey, circles);
         stepsPane.setId("legs");
 
-        
+        Pane Annotation = new Pane(){
+            @Override
+            protected void layoutChildren() {
+                getChildren().removeIf(node -> node instanceof Line);
 
-        StackPane stackPane1 = new StackPane(stepsPane);
+                super.layoutChildren();
+                for (Pair<Circle, Circle> pair : circles) {
+                    Circle depCircle = pair.getKey();
+                    Circle arrCircle = pair.getValue();
+
+                    double startX = depCircle.getBoundsInParent().getCenterX();
+                    double startY = depCircle.getBoundsInParent().getCenterY();
+                    double endX = arrCircle.getBoundsInParent().getCenterX();
+                    double endY = arrCircle.getBoundsInParent().getCenterY();
+
+                    Line line = new Line(startX, startY, endX, endY);
+                    line.setStroke(Color.RED);
+                    line.setStrokeWidth(2);
+
+                    getChildren().add(line);
+                }
+            }
+        };
+        Annotation.setId("annotations");
+
+        StackPane stackPane1 = new StackPane(Annotation, stepsPane);
         Button map = new Button("Carte");
         Button calendar = new Button("Calendrier");
         HBox buttonBar = new HBox(2, map, calendar);
@@ -62,9 +86,9 @@ public record DetailUI (Node rootNode) {
         return new DetailUI(detailPane);
     }
 
-    private static GridPane createStepsPane(ObservableValue<Journey> journey) {
+    private static GridPane createStepsPane(ObservableValue<Journey> journey, List<Pair<Circle,Circle>> circles) {
 
-        circleGridPane stepsPane = new circleGridPane();
+        GridPane stepsPane = new GridPane();
         List<Journey.Leg> steps = journey.getValue().legs();
         AtomicInteger rowIndex= new AtomicInteger(0);
         steps.forEach((l) -> {
@@ -140,44 +164,12 @@ public record DetailUI (Node rootNode) {
                 stepsPane.add(circle1,           1, rowIndex.get()); GridPane.setHalignment(circle1, HPos.CENTER);
                 stepsPane.add(arrStop,   2, rowIndex.get()); GridPane.setHalignment(arrStop, HPos.LEFT);
                 stepsPane.add(arrPlatform,  3, rowIndex.get()); GridPane.setHalignment(arrPlatform, HPos.LEFT);
-                stepsPane.addCirclePair(circle,circle1);
+                circles.add(new Pair<>(circle,circle1));
                 rowIndex.getAndIncrement();
             }
         });
 
         return stepsPane;
-    }
-
-    private static class circleGridPane extends GridPane {
-
-
-        private final List<Pair<Circle, Circle>> circlePairs = new ArrayList<>();
-
-        public void addCirclePair(Circle depCircle, Circle arrCircle) {
-            circlePairs.add(new Pair<>(depCircle, arrCircle));
-        }
-
-        @Override
-        protected void layoutChildren() {
-            getChildren().removeIf(node -> node instanceof Line);
-
-            super.layoutChildren();
-            for (Pair<Circle, Circle> pair : circlePairs) {
-                Circle depCircle = pair.getKey();
-                Circle arrCircle = pair.getValue();
-
-                double startX = depCircle.getBoundsInParent().getCenterX();
-                double startY = depCircle.getBoundsInParent().getCenterY();
-                double endX = arrCircle.getBoundsInParent().getCenterX();
-                double endY = arrCircle.getBoundsInParent().getCenterY();
-
-                Line line = new Line(startX, startY, endX, endY);
-                line.setStroke(Color.RED);
-                line.setStrokeWidth(2);
-
-                getChildren().addFirst(line);
-            }
-        }
     }
 }
 
