@@ -3,6 +3,7 @@ package ch.epfl.rechor.gui;
 
 import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
+import ch.epfl.rechor.journey.JourneyGeoJsonConverter;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -20,6 +21,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -66,6 +71,15 @@ public record DetailUI (Node rootNode) {
 
         StackPane stackPane1 = new StackPane(Annotation, stepsPane);
         Button map = new Button("Carte");
+        map.setOnAction(event -> {
+            URI link = null;
+            try {
+                link = new URI("https://","umap.osm.ch","/fr/map", "data="+ JourneyGeoJsonConverter.toGeoJSON(journey.getValue()), null);
+                Desktop.getDesktop().browse(link);
+            } catch (URISyntaxException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         Button calendar = new Button("Calendrier");
         HBox buttonBar = new HBox(2, map, calendar);
         buttonBar.setId("buttons");
