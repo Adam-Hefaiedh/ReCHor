@@ -17,6 +17,12 @@ import java.time.temporal.ChronoField;
  * @author El Hassan Lyoussi (398924).
  */
 public final class FormatterFr {
+    private static final DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
+            .appendValue(ChronoField.HOUR_OF_DAY)
+            .appendLiteral('h')
+            .appendValue(ChronoField.MINUTE_OF_HOUR,2)
+            .toFormatter();
+
     /**
      * Retourne la représentation textuelle de la durée donnée.
      * @param duration durée à représenter.
@@ -35,12 +41,7 @@ public final class FormatterFr {
      * @return la représentation textuelle de l'heure de la date/heure donnée.
      */
     public static String formatTime(LocalDateTime dateTime) {
-        DateTimeFormatter fmt = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.HOUR_OF_DAY)
-                .appendLiteral('h')
-                .appendValue(ChronoField.MINUTE_OF_HOUR,2)
-                .toFormatter();
-        return fmt.format(dateTime);
+        return dateTimeFormatter.format(dateTime);
     }
     /**
      * Retourne la représentation textuelle de la voie ou quai de l'arrêt

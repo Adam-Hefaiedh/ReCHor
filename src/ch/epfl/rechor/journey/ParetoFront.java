@@ -1,6 +1,7 @@
 package ch.epfl.rechor.journey;
 
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.function.LongConsumer;
 
@@ -65,7 +66,6 @@ public final class ParetoFront {
      */
     public static class Builder{
         private long[] tuples_build;
-        private int capacity;
         private int size_effective;
         private static final int MAX_PAYLOAD = 0xFFFFFFFF;
 
@@ -74,7 +74,6 @@ public final class ParetoFront {
          */
         public Builder(){
             tuples_build = new long[2];
-            capacity = 2;
             size_effective = 0;
         }
 
@@ -84,8 +83,7 @@ public final class ParetoFront {
          * @param that Bâtisseur à copier.
          **/
         public Builder(Builder that) {
-            tuples_build = that.tuples_build;
-            capacity = that.capacity;
+            tuples_build = that.tuples_build.clone();
             size_effective = that.size_effective;
         }
 
@@ -102,9 +100,7 @@ public final class ParetoFront {
          * @return Le builder courant.
          */
         public Builder clear(){
-            tuples_build = EMPTY.tuples;
             size_effective = 0;
-            capacity = 0;
             return this;
         }
 
@@ -120,14 +116,21 @@ public final class ParetoFront {
             }
 
             int dest = eliminateDominator(pos, packedTuple);
+            if(dest >= tuples_build.length){
+                long[] tuples_build2 = new long[dest*3/2 +1];
+                arraycopy(tuples_build,0,tuples_build2,0,pos);
+                arraycopy(tuples_build,pos,tuples_build2,pos+1, dest-pos);
+                tuples_build2[pos] = packedTuple;
+                size_effective = dest+1;
+                tuples_build = tuples_build2;
+            }
+            else {
+                arraycopy(tuples_build,0,tuples_build,0,pos);
+                arraycopy(tuples_build,pos,tuples_build,pos+1, dest-pos);
+                tuples_build[pos] = packedTuple;
+                size_effective = dest+1;
+            }
 
-            long[] tuples_build2 = new long[dest*3/2 +1];
-            arraycopy(tuples_build,0,tuples_build2,0,pos);
-            arraycopy(tuples_build,pos,tuples_build2,pos+1, dest-pos);
-            tuples_build2[pos] = packedTuple;
-            capacity = dest*3/2 +1;
-            size_effective = dest+1;
-            tuples_build = tuples_build2;
             return this;
         }
 
@@ -158,10 +161,9 @@ public final class ParetoFront {
             }
 
             if(size == size_effective){
-                if(size_effective == capacity){
-                    long[] tuples_build1 = new long[capacity*3/2 +1];
-                    arraycopy(tuples_build,0,tuples_build1,0,capacity);
-                    capacity++;
+                if(size_effective == tuples_build.length){
+                    long[] tuples_build1 = new long[size_effective*3/2 +1];
+                    arraycopy(tuples_build,0,tuples_build1,0,size_effective);
                     tuples_build = tuples_build1;
                 }
                 tuples_build[size_effective] = packedTuple;

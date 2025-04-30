@@ -14,6 +14,8 @@ import java.util.List;
  * @author El Hassan Lyoussi (398924).
  */
 public final class IcalBuilder {
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
 
     /**
      * Enumération des composants de l'iCalendar.
@@ -94,7 +96,7 @@ public final class IcalBuilder {
      * @return l'instance courante de IcalBuilder pour permettre l'enchaînement des appels.
      */
     public IcalBuilder add(Name name, LocalDateTime dateTime){
-        String dateTimeStr = dateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"));
+        String dateTimeStr = dateTime.format(formatter);
         add(name, dateTimeStr);
         return this;
     }

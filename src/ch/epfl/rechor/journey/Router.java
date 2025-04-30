@@ -1,29 +1,115 @@
 package ch.epfl.rechor.journey;
-
 import ch.epfl.rechor.Bits32_24_8;
 import ch.epfl.rechor.PackedRange;
 import ch.epfl.rechor.timetable.*;
 import ch.epfl.rechor.timetable.mapped.FileTimeTable;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
 public record Router(TimeTable timeTable) {
+    public Profile profile(LocalDate date , int arrStationId){
+        Profile.Builder profileBuilder = new Profile.Builder(timeTable, date, arrStationId);
+        Connections connections = timeTable.connectionsFor(date);
+        Transfers transfers = timeTable.transfers();
+        int[] walkableChanges = walkingChangesArray(arrStationId);
+        for (int connectionID = 0; connectionID < connections.size(); connectionID++) {
+            ParetoFront.Builder ParetoFront = new ParetoFront.Builder();
+            /// Conditions numero 1 :
+            int arrStopId = timeTable.stationId(connections.arrStopId(connectionID));
+            int depStationId = timeTable.stationId(connections.depStopId(connectionID));
 
+
+            if(walkableChanges[arrStopId] != -1) {
+                int payload = Bits32_24_8.pack(connectionID, 0);
+                int arrMin = connections.arrMins(connectionID);
+                ParetoFront.add( arrMin + walkableChanges[arrStopId] ,0,payload);
+            }
+
+
+            /// Conditions numero 2 :
+            int tripId = connections.tripId(connectionID);
+            ParetoFront.Builder tripFront = profileBuilder.forTrip(tripId);
+            if (tripFront != null) {
+                ParetoFront.addAll(tripFront);
+            }
+
+            /// Conditions numero 3 :
+            if (profileBuilder.forStation(arrStopId) != null) {
+                ParetoFront.Builder arrivalFront = profileBuilder.forStation(arrStopId);
+                int finalConnectionID = connectionID; /// Afin d'etre utiliser dans la Lambda
+                arrivalFront.forEach(f -> {
+                    int depMins = PackedCriteria.depMins(f);
+                    if (depMins >= connections.arrMins(finalConnectionID)) {
+                        int updatedPayload = Bits32_24_8.pack(finalConnectionID,0);
+                        long tuple = PackedCriteria.withoutDepMins(
+                                PackedCriteria.withPayload(
+                                        PackedCriteria.withAdditionalChange(f),
+                                        updatedPayload)
+                        );
+                        ParetoFront.add(tuple);
+                    }
+                });
+            }
+            if(profileBuilder.forTrip(tripId) == null)profileBuilder.setForTrip(tripId, ParetoFront);
+            else profileBuilder.forTrip(tripId).addAll(ParetoFront);
+            if(ParetoFront.isEmpty()){
+                continue;
+            }
+            /// Mise a jour des tuples
+            int inter = transfers.arrivingAt(depStationId);/// Pourquoi l'ensemble des changements de depStation id et pas de Arr ID
+            for (int j = PackedRange.startInclusive(inter); j < PackedRange.endExclusive(inter); j++) {
+                int d = connections.depMins(connectionID) - transfers.minutes(j);
+                ParetoFront.Builder paretoBuildWithDep = new ParetoFront.Builder();
+                //MISE A JOUR 2
+                int finalConnectionID = connectionID;
+                ParetoFront.forEach((t) -> {
+                    int intermediatesStop = connections.tripPos(Bits32_24_8.unpack24(PackedCriteria.payload(t))) -
+                            connections.tripPos(finalConnectionID);
+                    int payload = Bits32_24_8.pack(finalConnectionID, intermediatesStop);
+                    long updatesTuple = PackedCriteria.withDepMins(
+                            PackedCriteria.withPayload(t,
+                                    payload
+                            ),
+                            d
+                    );
+                    paretoBuildWithDep.add(updatesTuple);
+                });
+                if (profileBuilder.forStation(transfers.depStationId(j)) == null)
+                    profileBuilder.setForStation(transfers.depStationId(j), paretoBuildWithDep);
+                else
+                    profileBuilder.forStation(transfers.depStationId(j)).addAll(paretoBuildWithDep);
+            }
+        }
+        return profileBuilder.build();
+    }
+
+    private int[] walkingChangesArray(int arrStationId) {
+        int length = timeTable.stations().size();
+        int[] walkingTimes = new int[length];
+        Arrays.fill(walkingTimes,
+                -1);
+        Transfers transfers = timeTable.transfers();
+
+        int arrivingAt = transfers.arrivingAt(arrStationId);
+        int startIdx = PackedRange.startInclusive(arrivingAt);
+        int endIdx = PackedRange.endExclusive(arrivingAt);
+        for (int i = startIdx; i < endIdx; i++) {
+            int depStationId = transfers.depStationId(i);
+            int transferTime = transfers.minutes(i);
+            walkingTimes[depStationId] = transferTime;
+        }
+        return walkingTimes;
+    }
     static int stationId(Stations stations, String stationName) {
-        for(int i=0; i<stations.size(); i++){
-            if(stations.name(i).equals(stationName)){
+        for (int i = 0; i < stations.size(); i++) {
+            if (stations.name(i).equals(stationName)) {
                 return i;
             }
         }
-        return -1;
+        throw new IllegalArgumentException("Station not found: " + stationName);
     }
-
     public static void main(String[] args) throws IOException {
         long tStart = System.nanoTime();
 
@@ -42,76 +128,6 @@ public record Router(TimeTable timeTable) {
 
         double elapsed = (System.nanoTime() - tStart) * 1e-9;
         System.out.printf("Temps écoulé : %.3f s%n", elapsed);
-    }
 
-    public Profile profile(LocalDate date, int arrStationId)
-    {
-        Profile.Builder profileBuild = new Profile.Builder(timeTable,date,arrStationId);
-        Connections allConnection = timeTable.connectionsFor(date);
-        Transfers transfers = timeTable.transfers();
-        int[] timeTransfers = new int[timeTable.stations().size()];
-        Arrays.fill(timeTransfers, -1);
-        int interval =  transfers.arrivingAt(arrStationId);
-        for(int i = PackedRange.startInclusive(interval); i < PackedRange.endExclusive(interval); i++)
-        {
-            timeTransfers[transfers.depStationId(i)] = transfers.minutes(i);
-        }
-
-        for(int i=0; i< allConnection.size(); i++){
-            int depStationId = timeTable.stationId(allConnection.depStopId(i));
-            int arrStation = timeTable.stationId(allConnection.arrStopId(i));
-            ParetoFront.Builder paretoBuild = new ParetoFront.Builder();
-            if(timeTransfers[arrStation] != -1)
-            {
-
-                paretoBuild.add(allConnection.arrMins(i) + timeTransfers[arrStation],0,Bits32_24_8.pack(i,0));
-
-            }
-            if(profileBuild.forTrip(allConnection.tripId(i)) != null) {
-                paretoBuild.addAll(profileBuild.forTrip(allConnection.tripId(i)));
-            }
-
-            int finalI = i;
-            if(profileBuild.forStation(arrStation) != null) {
-                profileBuild.forStation(arrStation).forEach(
-                        (t) -> {
-                            int depTime = PackedCriteria.depMins(t);
-                            int arrTime = allConnection.arrMins(finalI);
-                            if( depTime >= arrTime) {
-                                paretoBuild.add(PackedCriteria.withoutDepMins(
-                              PackedCriteria.withAdditionalChange(PackedCriteria.withPayload(t,Bits32_24_8.pack(finalI,0)))));
-                            }
-                        }
-                );
-            }
-            //MISE A JOUR 1
-            if (!paretoBuild.isEmpty()) {
-                if (profileBuild.forTrip(allConnection.tripId(i)) == null) {
-                    profileBuild.setForTrip(allConnection.tripId(i), paretoBuild);
-                } else profileBuild.forTrip(allConnection.tripId(i)).addAll(paretoBuild);
-
-                int inter = transfers.arrivingAt( depStationId);
-                if(profileBuild.forStation(depStationId) == null || !profileBuild.forStation(depStationId).fullyDominates(paretoBuild,allConnection.depMins(i))) {
-                    for (int j = PackedRange.startInclusive(inter); j < PackedRange.endExclusive(inter); j++) {
-                        int d = allConnection.depMins(i) - transfers.minutes(j);
-                        ParetoFront.Builder paretoBuildWithDep = new ParetoFront.Builder();
-                        //MISE A JOUR 2
-                            paretoBuild.forEach((t) -> {
-                                int associatedInformation = Bits32_24_8.pack(finalI,
-                                        allConnection.tripPos(Bits32_24_8.unpack24(PackedCriteria.payload(t)))
-                                                - allConnection.tripPos(finalI));//il manque la position dans la course,
-                                // de la liason a laquelle il faut descendre de la course.
-                                long tWithPayload = PackedCriteria.withPayload(t, associatedInformation);
-                                paretoBuildWithDep.add(PackedCriteria.withDepMins(tWithPayload, d));
-                            });
-                            if (profileBuild.forStation(transfers.depStationId(j)) == null)
-                                profileBuild.setForStation(transfers.depStationId(j), paretoBuildWithDep);
-                            else profileBuild.forStation(transfers.depStationId(j)).addAll(paretoBuildWithDep);
-                    }
-                }
-            }
-        }
-
-        return profileBuild.build();
     }
 }
