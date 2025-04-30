@@ -91,7 +91,7 @@ public record DetailUI (Node rootNode) {
             try {
                 FileChooser file = new FileChooser();
                 file.setTitle("format iCalendar");
-                file.setInitialFileName("voyage_" + FormatterFr.formatTime(journey.getValue().depTime()) + ".ics");
+                file.setInitialFileName("voyage_" + journey.getValue().depTime().toLocalDate() + ".ics");
 
                 File selectedFile = file.showSaveDialog(calendar.getScene().getWindow());
                 Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(journey.getValue()));
