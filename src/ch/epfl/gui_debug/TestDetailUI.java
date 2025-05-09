@@ -1,6 +1,7 @@
 package ch.epfl.gui_debug;
 
 import ch.epfl.rechor.gui.DetailUI;
+import ch.epfl.rechor.gui.SummaryUI;
 import ch.epfl.rechor.journey.Journey;
 import ch.epfl.rechor.journey.JourneyExtractor;
 import ch.epfl.rechor.journey.Profile;
@@ -19,7 +20,9 @@ import javafx.stage.Stage;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Month;
+import java.util.List;
 
 public final class TestDetailUI extends Application {
     public static void main(String[] args) {launch(args); }
@@ -44,13 +47,15 @@ public final class TestDetailUI extends Application {
         int arrStationId = stationId(stations, "Gruyères");
         Router router = new Router(timeTable);
         Profile profile = router.profile(date, arrStationId);
-        Journey journey = JourneyExtractor
-                .journeys(profile, depStationId)
-                .get(32);
-        ObservableValue<Journey> journeyO =
-                new SimpleObjectProperty<>(journey);
-        DetailUI detailUI = DetailUI.create(journeyO);
-        Pane root = new BorderPane(detailUI.rootNode());
+        List<Journey> journeys = JourneyExtractor
+                .journeys(profile, depStationId);
+
+        ObservableValue<List<Journey>> journeysO =
+                new SimpleObjectProperty<>(journeys);
+        ObservableValue<LocalTime> depTimeO =
+                new SimpleObjectProperty<>(LocalTime.of(16, 00));
+        SummaryUI summaryUI = SummaryUI.create(journeysO, depTimeO);
+        Pane root = new BorderPane(summaryUI.rootNode());
         primaryStage.setScene(new Scene(root));
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(600);
