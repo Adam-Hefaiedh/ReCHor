@@ -17,6 +17,9 @@ import java.time.temporal.ChronoField;
  * @author El Hassan Lyoussi (398924).
  */
 public final class FormatterFr {
+
+    private FormatterFr(){}
+
     private static final DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.HOUR_OF_DAY)
             .appendLiteral('h')
