@@ -5,7 +5,26 @@ import ch.epfl.rechor.timetable.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+/**
+ * Classe permettant d'implémenter l'algorithme Connection Scan Algorithm (CSA) permettant de calculer
+ * le profil de tous les voyages optimaux dans un réseau de transport public.
+ * @param timeTable valeur contenant les données horaires à utiliser.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
+ */
 public record Router(TimeTable timeTable) {
+
+    /**
+     * Permet de calculer le profil de tous les voyages optimaux
+     * permettant de se rendre de n'importe quelle gare du réseau à
+     * une gare d'arrivée donnée, un jour donné.
+     * @param date la date pour laquelle les voyages optimaux doivent être calculés.
+     * @param arrStationId l'identité de la gare de destination.
+     *
+     * @return le profil de tous les voyages optimaux permettant de se rendre
+     * de n'importe quelle gare du réseau à celle de destination, le jour donné
+     */
     public Profile profile(LocalDate date , int arrStationId){
         Profile.Builder profileBuilder = new Profile.Builder(timeTable, date, arrStationId);
         Connections connections = timeTable.connectionsFor(date);
@@ -15,12 +34,15 @@ public record Router(TimeTable timeTable) {
             ParetoFront.Builder paretoBuild = new ParetoFront.Builder();
             int arrStopId = timeTable.stationId(connections.arrStopId(connectionID));
             int depStationId = timeTable.stationId(connections.depStopId(connectionID));
+            int connectionDepMins = connections.depMins(connectionID);
+            int connectionArrMins = connections.arrMins(connectionID);
+            int connectionTripPos = connections.tripPos(connectionID);
+
             int currentConnection = connectionID;
 
             if(walkableChanges[arrStopId] != -1) {
                 int payload = Bits32_24_8.pack(connectionID, 0);
-                int arrMin = connections.arrMins(connectionID);
-                paretoBuild.add( arrMin + walkableChanges[arrStopId] ,0,payload);
+                paretoBuild.add( connectionArrMins + walkableChanges[arrStopId] ,0,payload);
             }
 
             int tripId = connections.tripId(connectionID);
@@ -50,26 +72,23 @@ public record Router(TimeTable timeTable) {
                 if(profileBuilder.forTrip(tripId) == null)profileBuilder.setForTrip(tripId, paretoBuild);
                 else profileBuilder.forTrip(tripId).addAll(paretoBuild);
                 int inter = transfers.arrivingAt(depStationId);
-                if(profileBuilder.forStation(depStationId) != null && profileBuilder.forStation(depStationId).fullyDominates(paretoBuild, connections.depMins(connectionID))) {
+                if(profileBuilder.forStation(depStationId) == null || !(profileBuilder.forStation(depStationId).fullyDominates(paretoBuild, connectionDepMins))) {
                     for (int j = PackedRange.startInclusive(inter); j < PackedRange.endExclusive(inter); j++) {
-                        int d = connections.depMins(connectionID) - transfers.minutes(j);
-                        ParetoFront.Builder paretoBuildWithDep = new ParetoFront.Builder();
+                        int d = connectionDepMins - transfers.minutes(j);
+                        int currentStation = transfers.depStationId(j);
                         paretoBuild.forEach((t) -> {
                             int intermediatesStop = connections.tripPos(Bits32_24_8.unpack24(PackedCriteria.payload(t))) -
-                                    connections.tripPos(currentConnection);
+                                    connectionTripPos;
                             int payload = Bits32_24_8.pack(currentConnection, intermediatesStop);
                             long updatesTuple = PackedCriteria.withDepMins(
                                     PackedCriteria.withPayload(t,
-                                            payload
-                                    ),
-                                    d
-                            );
-                            paretoBuildWithDep.add(updatesTuple);
+                                            payload), d);
+
+                            if ( profileBuilder.forStation(currentStation) == null)
+                                profileBuilder.setForStation(currentStation, new ParetoFront.Builder().add(updatesTuple));
+                            else
+                                profileBuilder.forStation(currentStation).add(updatesTuple);
                         });
-                        if (profileBuilder.forStation(transfers.depStationId(j)) == null)
-                            profileBuilder.setForStation(transfers.depStationId(j), paretoBuildWithDep);
-                        else
-                            profileBuilder.forStation(transfers.depStationId(j)).addAll(paretoBuildWithDep);
                     }
                 }
             }
@@ -80,17 +99,15 @@ public record Router(TimeTable timeTable) {
     private int[] walkingChangesArray(int arrStationId) {
         int length = timeTable.stations().size();
         int[] walkableChanges = new int[length];
-        Arrays.fill(walkableChanges,
-                -1);
-        Transfers transfers = timeTable.transfers();
+        Arrays.fill(walkableChanges, -1);
 
+        Transfers transfers = timeTable.transfers();
         int arrivingAt = transfers.arrivingAt(arrStationId);
+
         int startIdx = PackedRange.startInclusive(arrivingAt);
         int endIdx = PackedRange.endExclusive(arrivingAt);
         for (int i = startIdx; i < endIdx; i++) {
-            int depStationId = transfers.depStationId(i);
-            int transferTime = transfers.minutes(i);
-            walkableChanges[depStationId] = transferTime;
+            walkableChanges[transfers.depStationId(i)] = transfers.minutes(i);
         }
         return walkableChanges;
     }

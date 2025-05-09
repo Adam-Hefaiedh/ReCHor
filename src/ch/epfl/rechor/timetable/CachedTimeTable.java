@@ -1,10 +1,14 @@
 package ch.epfl.rechor.timetable;
 
-import ch.epfl.rechor.timetable.mapped.FileTimeTable;
-
-import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 
+/**
+ * La classe représente un horaire dont les données qui dépendent
+ * de la date sont stockées dans un cache.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
+ */
 public class CachedTimeTable implements TimeTable{
 
     private LocalDate date = null;
@@ -43,22 +47,21 @@ public class CachedTimeTable implements TimeTable{
 
     @Override
     public Trips tripsFor(LocalDate date) {
-
-        if (this.date != date) {
-            this.date = date;
-            cachedTrip = underlyingTimeTable.tripsFor(date);
-            cachedConnection = underlyingTimeTable.connectionsFor(date);
-        }
+        updateIfNecessary(date);
         return cachedTrip;
     }
 
     @Override
     public Connections connectionsFor(LocalDate date) {
+        updateIfNecessary(date);
+        return cachedConnection;
+    }
+
+    private void updateIfNecessary(LocalDate date){
         if (this.date != date){
             this.date = date;
             cachedConnection = underlyingTimeTable.connectionsFor(date);
             cachedTrip = underlyingTimeTable.tripsFor(date);
         }
-        return cachedConnection;
     }
 }

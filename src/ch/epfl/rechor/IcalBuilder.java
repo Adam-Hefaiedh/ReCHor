@@ -14,7 +14,7 @@ import java.util.List;
  * @author El Hassan Lyoussi (398924).
  */
 public final class IcalBuilder {
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
 
 
     /**
