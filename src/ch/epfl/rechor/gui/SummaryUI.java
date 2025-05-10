@@ -4,13 +4,9 @@ import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.beans.value.ObservableValueBase;
-import javafx.collections.FXCollections;
 import javafx.scene.Node;
-import javafx.scene.control.Cell;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionModel;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -19,32 +15,37 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
-import java.text.Normalizer;
+
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+/**
+ * La classe représente la partie de l'interface graphique qui montre la vue d'ensemble des voyages.
+ * @param rootNode nœud JavaFX à la racine de son graphe de scène.
+ * @param selectedJourneyO valeur contenant le voyage sélectionné dans la vue d'ensemble.
+ */
 public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO) {
 
+    /**
+     * Permet de créer le graphe de scène.
+     * @param allJourney valeur contenant la liste des voyages à afficher.
+     * @param hour valeur contenant l'heure de voyage désirée.
+     *
+     * @return une instance de SummaryUI contenant sa racine ainsi
+     * que la valeur observable contenant le voyage sélectionné.
+     */
     public static SummaryUI create(ObservableValue<List<Journey>> allJourney, ObservableValue<LocalTime> hour)
     {
-
+        List<Journey> journeys = allJourney.getValue();
+        LocalTime currentTime = hour.getValue();
         ListView<Journey> allElements = new ListView<>();
         allElements.setCellFactory(listView -> new journeyCellList());
-        allJourney.getValue().forEach(journey -> allElements.getItems().add(journey));
+        journeys.forEach(journey -> allElements.getItems().add(journey));
         allElements.getStylesheets().add("summary.css");
-        int id = -1;
-        int currentIndex = 0;
-        do {
-            if(currentIndex == allJourney.getValue().size())id = currentIndex-1;
-            else if(!allJourney.getValue().get(currentIndex).depTime().toLocalTime().isBefore(hour.getValue()))id = currentIndex;
-
-            currentIndex++;
-        }while (id == -1);
-        ObservableValue<Journey> currentJourney = new SimpleObjectProperty<>(allJourney.getValue().get(id));
+        int id = findSelectedJourney(journeys, currentTime);
+        ObservableValue<Journey> currentJourney = new SimpleObjectProperty<>(journeys.get(id));
         allElements.getSelectionModel().select(id);
         allElements.scrollTo(id);
         return new SummaryUI(allElements, currentJourney);
@@ -66,21 +67,21 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 setPrefSize(0,0);
                 Line line = new Line(5,getHeight()/2,getWidth()-5,getHeight()/2);
                 getChildren().add(line);
-                Circle circle1 = new Circle(3);
-                circle1.setCenterX(line.getStartX());
-                circle1.setCenterY(line.getStartY());
-                circle1.getStyleClass().add("dep-arr");
-                Circle circle2 = new Circle(3);
-                circle2.setCenterX(line.getEndX());
-                circle2.setCenterY(line.getEndY());
-                circle2.getStyleClass().add("dep-arr");
-                getChildren().add(circle1);
-                getChildren().add(circle2);
-                circle.forEach(circle3 -> {
-                        double position = (double) circle3.getUserData()*(getWidth()-2*5) + 5;
-                        circle3.setCenterX(position);
-                        circle3.setCenterY(getHeight()/2);
-                        getChildren().add(circle3);
+                Circle depCircle = new Circle(3);
+                depCircle.setCenterX(line.getStartX());
+                depCircle.setCenterY(line.getStartY());
+                depCircle.getStyleClass().add("dep-arr");
+                Circle arrCircle = new Circle(3);
+                arrCircle.setCenterX(line.getEndX());
+                arrCircle.setCenterY(line.getEndY());
+                arrCircle.getStyleClass().add("dep-arr");
+                getChildren().add(depCircle);
+                getChildren().add(arrCircle);
+                circle.forEach(middleCircle -> {
+                        double position = (double) middleCircle.getUserData()*(getWidth()-2*5) + 5;
+                        middleCircle.setCenterX(position);
+                        middleCircle.setCenterY(getHeight()/2);
+                        getChildren().add(middleCircle);
                 });
             }
         };
@@ -106,34 +107,49 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         protected void updateItem(Journey item, boolean empty) {
             super.updateItem(item, empty);
             int transportIndex;
+
             circle.clear();
             if (empty || item == null) {
                 setText(null);
                 setGraphic(null);
             } else {
+                List<Journey.Leg> legs = item.legs();
                 departure.setText(FormatterFr.formatTime(item.depTime()));
                 arrival.setText(FormatterFr.formatTime(item.arrTime()));
                 duration.setText(FormatterFr.formatDuration(item.duration()));
-                if(item.legs().getFirst() instanceof Journey.Leg.Transport)
+                if(legs.getFirst() instanceof Journey.Leg.Transport)
                     transportIndex = 0;
                 else{
                     transportIndex = 1;
                 }
-                for(int i= transportIndex+1; i<item.legs().size(); i+=2)
+                for(int i= transportIndex+1; i<legs.size()-1; i+=2)
                 {
-                    Circle miniCircle = new Circle(3);
-                    miniCircle.getStyleClass().add("transfer");
-                    Duration totalDuration = Duration.between(item.depTime(),item.legs().get(i).depTime());
+                    Circle middleCircle = new Circle(3);
+                    middleCircle.getStyleClass().add("transfer");
+                    Duration totalDuration = Duration.between(item.depTime(),legs.get(i).depTime());
                     double position = (double) totalDuration.toMinutes() /item.duration().toMinutes();
-                    miniCircle.setUserData(position);
-                    circle.add(miniCircle);
+                    middleCircle.setUserData(position);
+                    circle.add(middleCircle);
                 }
-                direction.setText(FormatterFr.formatRouteDestination((Journey.Leg.Transport) item.legs().get(transportIndex)));
-                imageView.setImage(VehicleIcons.IconFor(((Journey.Leg.Transport) item.legs().get(transportIndex)).vehicle()));
+                direction.setText(FormatterFr.formatRouteDestination((Journey.Leg.Transport) legs.get(transportIndex)));
+                imageView.setImage(VehicleIcons.IconFor(((Journey.Leg.Transport) legs.get(transportIndex)).vehicle()));
                 imageView.setFitHeight(20);
                 imageView.setFitWidth(20);
                 setGraphic(journeyPane);
             }
         }
+    }
+    
+    private static int findSelectedJourney(List<Journey> allJourney, LocalTime hour)
+    {
+        int id = -1;
+        int currentIndex = 0;
+        do {
+            if(currentIndex == allJourney.size())id = currentIndex-1;
+            else if(!allJourney.get(currentIndex).depTime().toLocalTime().isBefore(hour))id = currentIndex;
+
+            currentIndex++;
+        }while (id == -1);
+        return id;
     }
 }

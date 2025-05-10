@@ -14,6 +14,9 @@ import static java.lang.System.arraycopy;
  */
 public final class ParetoFront {
     private final long[] tuples;
+    /**
+     * Variable ParetoFront contenant une frontière de Pareto vide.
+     */
     public static final ParetoFront EMPTY = new ParetoFront(new long[0]);
 
     private ParetoFront(long[] tuples){
