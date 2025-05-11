@@ -58,7 +58,8 @@ public record DetailUI (Node rootNode) {
         noJourney.setId("no-journey");
         List<Pair<Circle,Circle>> circles = new ArrayList<>();
 
-        GridPane stepsPane = createStepsPane(journey.getValue(), circles);
+        GridPane stepsPane = new GridPane();
+        createStepsPane(journey.getValue(), circles, stepsPane);
         stepsPane.setId("legs");
 
         Pane Annotation = new Pane(){
@@ -86,25 +87,29 @@ public record DetailUI (Node rootNode) {
         };
         Annotation.setId("annotations");
 
-        VBox Page = getPage(journey, Annotation, stepsPane);
+        Journey currentJourney = journey.getValue();
+
+        VBox Page = getPage(currentJourney, Annotation, stepsPane);
 
         StackPane window = new StackPane(noJourney, Page);
 
-        Journey currentJourney = journey.getValue();
-        if (currentJourney != null) {
-            Page.setVisible(true);
-            noJourney.setVisible(false);
-        } else {
-            Page.setVisible(false);
-            noJourney.setVisible(true);
-        }
+        journey.addListener((obs, oldJourney, newJourney) -> {
+                if(oldJourney != newJourney){
+                    // Vider tout et reconstruire
+                    circles.clear();
+                    stepsPane.getChildren().clear();
+                    createStepsPane(newJourney, circles, stepsPane);
+
+                    Annotation.requestLayout();
+                }
+        });
+        Page.setVisible(currentJourney != null);
+        noJourney.setVisible(currentJourney == null);
         detailPane.setContent(window);
         return new DetailUI(detailPane);
     }
 
-    private static GridPane createStepsPane(Journey journey, List<Pair<Circle,Circle>> circles) {
-
-        GridPane stepsPane = new GridPane();
+    private static void createStepsPane(Journey journey, List<Pair<Circle,Circle>> circles, GridPane stepsPane) {
         List<Journey.Leg> steps = new ArrayList<>();
         if(journey != null)  steps = journey.legs();
         AtomicInteger rowIndex= new AtomicInteger(0);
@@ -163,7 +168,6 @@ public record DetailUI (Node rootNode) {
             }
         });
 
-        return stepsPane;
     }
 
     private static void intermediateStopView(Journey.Leg leg, GridPane stepsPane, AtomicInteger rowIndex){
@@ -197,11 +201,11 @@ public record DetailUI (Node rootNode) {
         return vehicleImage;
     }
 
-    private static VBox getPage(ObservableValue<Journey> journey, Pane Annotation, GridPane stepsPane) {
+    private static VBox getPage(Journey journey, Pane Annotation, GridPane stepsPane) {
         StackPane Page = new StackPane(Annotation, stepsPane);
         Button map = createFunctionnalButton(event -> {
             try {
-                URI link = new URI("https","umap.osm.ch","/fr/map", "data="+ JourneyGeoJsonConverter.toGeoJSON(journey.getValue()), null);
+                URI link = new URI("https","umap.osm.ch","/fr/map", "data="+ JourneyGeoJsonConverter.toGeoJSON(journey), null);
                 Desktop.getDesktop().browse(link);
             } catch (URISyntaxException | IOException e) {
                 throw new RuntimeException(e);
@@ -212,10 +216,10 @@ public record DetailUI (Node rootNode) {
             try {
                 FileChooser file = new FileChooser();
                 file.setTitle("format iCalendar");
-                file.setInitialFileName("voyage_" + journey.getValue().depTime().toLocalDate() + ".ics");
+                file.setInitialFileName("voyage_" + journey.depTime().toLocalDate() + ".ics");
 
                 File selectedFile = file.showSaveDialog(Page.getScene().getWindow());
-                Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(journey.getValue()));
+                Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(journey));
             } catch(IOException e){
                 throw new RuntimeException(e);
             }

@@ -27,7 +27,7 @@ import java.util.List;
  * @param selectedJourneyO valeur contenant le voyage sélectionné dans la vue d'ensemble.
  */
 public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO) {
-
+    private static boolean change = false;
     /**
      * Permet de créer le graphe de scène.
      * @param allJourney valeur contenant la liste des voyages à afficher.
@@ -42,14 +42,34 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         LocalTime currentTime = hour.getValue();
         ListView<Journey> allElements = new ListView<>();
         allElements.setCellFactory(listView -> new journeyCellList());
-        journeys.forEach(journey -> allElements.getItems().add(journey));
-        allElements.getStylesheets().add("summary.css");
-        int id = findSelectedJourney(journeys, currentTime);
-        ObservableValue<Journey> currentJourney = new SimpleObjectProperty<>(journeys.get(id));
-        allElements.getSelectionModel().select(id);
-        allElements.scrollTo(id);
-        return new SummaryUI(allElements, currentJourney);
+        if(journeys != null) {
+            journeys.forEach(journey -> allElements.getItems().add(journey));
+
+            allElements.getStylesheets().add("summary.css");
+            int id = findSelectedJourney(journeys, currentTime);
+            allElements.getSelectionModel().select(id);
+            allElements.scrollTo(id);
+
+            ObservableValue<Journey> currentJourney = allElements.getSelectionModel().selectedItemProperty();
+            allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldJourney, newJourney) -> {
+                if (oldJourney != newJourney && newJourney != null) {
+                    change = true;
+                }
+            });
+
+            hour.addListener((obs, oldTime, newTime) -> {
+                if (!change) {
+                    int index = findSelectedJourney(journeys, newTime);
+                    allElements.getSelectionModel().select(index);
+                    allElements.scrollTo(index);
+                }
+            });
+
+            return new SummaryUI(allElements, currentJourney);
+        }
+        return new SummaryUI(allElements, new SimpleObjectProperty<>(null));
     }
+
 
     private static class journeyCellList extends ListCell<Journey> {
         private final Text departure = new Text();
