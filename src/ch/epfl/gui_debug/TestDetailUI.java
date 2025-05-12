@@ -1,6 +1,5 @@
 package ch.epfl.gui_debug;
 
-import ch.epfl.rechor.gui.DetailUI;
 import ch.epfl.rechor.gui.SummaryUI;
 import ch.epfl.rechor.journey.Journey;
 import ch.epfl.rechor.journey.JourneyExtractor;
