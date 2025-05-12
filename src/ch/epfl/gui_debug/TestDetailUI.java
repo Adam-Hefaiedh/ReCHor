@@ -1,5 +1,7 @@
 package ch.epfl.gui_debug;
 
+import ch.epfl.rechor.StopIndex;
+import ch.epfl.rechor.gui.QueryUI;
 import ch.epfl.rechor.gui.SummaryUI;
 import ch.epfl.rechor.journey.Journey;
 import ch.epfl.rechor.journey.JourneyExtractor;
@@ -21,7 +23,10 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class TestDetailUI extends Application {
     public static void main(String[] args) {launch(args); }
@@ -40,20 +45,19 @@ public final class TestDetailUI extends Application {
     public void start(Stage primaryStage) throws Exception {
         TimeTable timeTable = new CachedTimeTable(
                 FileTimeTable.in(Path.of("timetable")));
-        Stations stations = timeTable.stations();
-        LocalDate date = LocalDate.of(2025, Month.APRIL, 15);
-        int depStationId = stationId(stations, "Ecublens VD, EPFL");
-        int arrStationId = stationId(stations, "Gruyères");
-        Router router = new Router(timeTable);
-        Profile profile = router.profile(date, arrStationId);
-        List<Journey> journeys = JourneyExtractor
-                .journeys(profile, depStationId);
+        List<String> Name = new ArrayList<>();
+        Map<String, String> stations = new HashMap<>();
 
-        ObservableValue<List<Journey>> journeysO =
-                new SimpleObjectProperty<>(journeys);
-        ObservableValue<LocalTime> depTimeO =
-                new SimpleObjectProperty<>(LocalTime.of(16, 00));
-        SummaryUI summaryUI = SummaryUI.create(journeysO, depTimeO);
+        for(int i=0; i < timeTable.stationAliases().size(); i++) {
+                stations.put(timeTable.stationAliases().stationName(i), timeTable.stationAliases().alias(i));
+        }
+
+        for(int i=0; i < timeTable.stations().size(); i++) {
+            Name.add(timeTable.stations().name(i));
+        }
+
+        StopIndex stopIndex = new StopIndex(Name, stations);
+        QueryUI summaryUI = QueryUI.create(stopIndex);
         Pane root = new BorderPane(summaryUI.rootNode());
         primaryStage.setScene(new Scene(root));
         primaryStage.setMinWidth(400);
