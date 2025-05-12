@@ -27,7 +27,6 @@ import java.util.List;
  * @param selectedJourneyO valeur contenant le voyage sélectionné dans la vue d'ensemble.
  */
 public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO) {
-    private static boolean change = false;
     /**
      * Permet de créer le graphe de scène.
      * @param allJourney valeur contenant la liste des voyages à afficher.
@@ -52,19 +51,14 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
             ObservableValue<Journey> currentJourney = allElements.getSelectionModel().selectedItemProperty();
             allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldJourney, newJourney) -> {
-                if (oldJourney != newJourney && newJourney != null) {
-                    change = true;
+                if (!(oldJourney != newJourney && newJourney != null)) {
+                    hour.addListener((obs2, oldTime, newTime) -> {
+                            int index = findSelectedJourney(journeys, newTime);
+                            allElements.getSelectionModel().select(index);
+                            allElements.scrollTo(index);
+                    });
                 }
             });
-
-            hour.addListener((obs, oldTime, newTime) -> {
-                if (!change) {
-                    int index = findSelectedJourney(journeys, newTime);
-                    allElements.getSelectionModel().select(index);
-                    allElements.scrollTo(index);
-                }
-            });
-
             return new SummaryUI(allElements, currentJourney);
         }
         return new SummaryUI(allElements, new SimpleObjectProperty<>(null));
