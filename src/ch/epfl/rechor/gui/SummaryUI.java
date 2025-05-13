@@ -40,20 +40,16 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         allElements.setCellFactory(listView -> new journeyCellList());
         allElements.getStylesheets().add("summary.css");
 
-        // Créer une propriété pour le voyage sélectionné
         SimpleObjectProperty<Journey> selectedJourney = new SimpleObjectProperty<>();
 
-        // Lier la sélection de la liste à notre propriété
         allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             selectedJourney.set(newValue);
         });
 
-        // IMPORTANT: Ajouter un listener pour mettre à jour la liste quand allJourney change
         allJourney.addListener((obs, oldJourneys, newJourneys) -> {
             updateJourneyList(allElements, newJourneys, hour.getValue());
         });
 
-        // IMPORTANT: Ajouter un listener pour mettre à jour la sélection quand l'heure change
         hour.addListener((obs, oldTime, newTime) -> {
             List<Journey> journeys = allJourney.getValue();
             if (journeys != null && !journeys.isEmpty()) {
@@ -63,7 +59,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
             }
         });
 
-        // Initialiser la liste avec les valeurs actuelles
         List<Journey> initialJourneys = allJourney.getValue();
         if (initialJourneys != null) {
             updateJourneyList(allElements, initialJourneys, hour.getValue());
@@ -72,7 +67,6 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
         return new SummaryUI(allElements, selectedJourney);
     }
 
-    // Méthode helper pour mettre à jour la liste des voyages
     private static void updateJourneyList(ListView<Journey> listView, List<Journey> journeys, LocalTime time) {
         listView.getItems().clear();
         if (journeys != null && !journeys.isEmpty()) {

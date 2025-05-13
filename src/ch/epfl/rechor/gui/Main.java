@@ -52,7 +52,7 @@ public class Main extends Application {
         List<String> Name = new ArrayList<>();
         Map<String, String> aliases = new HashMap<>();
         for(int i=0; i < timeTable.stationAliases().size(); i++) {
-            aliases.put(timeTable.stationAliases().stationName(i), timeTable.stationAliases().alias(i));
+            aliases.put(timeTable.stationAliases().alias(i), timeTable.stationAliases().stationName(i));
         }
 
         for(int i=0; i < timeTable.stations().size(); i++) {
