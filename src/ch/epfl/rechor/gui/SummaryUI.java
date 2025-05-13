@@ -35,35 +35,53 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
      * @return une instance de SummaryUI contenant sa racine ainsi
      * que la valeur observable contenant le voyage sélectionné.
      */
-    public static SummaryUI create(ObservableValue<List<Journey>> allJourney, ObservableValue<LocalTime> hour)
-    {
-        List<Journey> journeys = allJourney.getValue();
-        LocalTime currentTime = hour.getValue();
+    public static SummaryUI create(ObservableValue<List<Journey>> allJourney, ObservableValue<LocalTime> hour) {
         ListView<Journey> allElements = new ListView<>();
         allElements.setCellFactory(listView -> new journeyCellList());
-        if(journeys != null) {
-            journeys.forEach(journey -> allElements.getItems().add(journey));
+        allElements.getStylesheets().add("summary.css");
 
-            allElements.getStylesheets().add("summary.css");
-            int id = findSelectedJourney(journeys, currentTime);
-            allElements.getSelectionModel().select(id);
-            allElements.scrollTo(id);
+        // Créer une propriété pour le voyage sélectionné
+        SimpleObjectProperty<Journey> selectedJourney = new SimpleObjectProperty<>();
 
-            ObservableValue<Journey> currentJourney = allElements.getSelectionModel().selectedItemProperty();
-            allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldJourney, newJourney) -> {
-                if (!(oldJourney != newJourney && newJourney != null)) {
-                    hour.addListener((obs2, oldTime, newTime) -> {
-                            int index = findSelectedJourney(journeys, newTime);
-                            allElements.getSelectionModel().select(index);
-                            allElements.scrollTo(index);
-                    });
-                }
-            });
-            return new SummaryUI(allElements, currentJourney);
+        // Lier la sélection de la liste à notre propriété
+        allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+            selectedJourney.set(newValue);
+        });
+
+        // IMPORTANT: Ajouter un listener pour mettre à jour la liste quand allJourney change
+        allJourney.addListener((obs, oldJourneys, newJourneys) -> {
+            updateJourneyList(allElements, newJourneys, hour.getValue());
+        });
+
+        // IMPORTANT: Ajouter un listener pour mettre à jour la sélection quand l'heure change
+        hour.addListener((obs, oldTime, newTime) -> {
+            List<Journey> journeys = allJourney.getValue();
+            if (journeys != null && !journeys.isEmpty()) {
+                int index = findSelectedJourney(journeys, newTime);
+                allElements.getSelectionModel().select(index);
+                allElements.scrollTo(index);
+            }
+        });
+
+        // Initialiser la liste avec les valeurs actuelles
+        List<Journey> initialJourneys = allJourney.getValue();
+        if (initialJourneys != null) {
+            updateJourneyList(allElements, initialJourneys, hour.getValue());
         }
-        return new SummaryUI(allElements, new SimpleObjectProperty<>(null));
+
+        return new SummaryUI(allElements, selectedJourney);
     }
 
+    // Méthode helper pour mettre à jour la liste des voyages
+    private static void updateJourneyList(ListView<Journey> listView, List<Journey> journeys, LocalTime time) {
+        listView.getItems().clear();
+        if (journeys != null && !journeys.isEmpty()) {
+            listView.getItems().addAll(journeys);
+            int index = findSelectedJourney(journeys, time);
+            listView.getSelectionModel().select(index);
+            listView.scrollTo(index);
+        }
+    }
 
     private static class journeyCellList extends ListCell<Journey> {
         private final Text departure = new Text();

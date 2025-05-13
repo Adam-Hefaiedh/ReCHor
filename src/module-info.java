@@ -8,5 +8,4 @@ module ReCHor {
     exports ch.epfl.rechor.gui;
     exports ch.epfl.rechor.journey;
     exports ch.epfl.rechor.timetable.mapped;
-    exports ch.epfl.gui_debug;
 }

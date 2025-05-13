@@ -69,8 +69,9 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
             });
 
             } else {
-                textField.textProperty().removeListener((observable, oldValue, newValue) -> {});
-                textField.boundsInLocalProperty().removeListener(((observable, oldValue, newValue) ->{}));
+                textField.boundsInLocalProperty().addListener((observable, oldValue, newValue) ->{
+                    resultsWindow.hide();
+                });
                 resultsWindow.hide();
 
                 String selectedStop = resultsList.getSelectionModel().getSelectedItem();

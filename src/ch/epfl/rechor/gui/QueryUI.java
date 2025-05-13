@@ -68,6 +68,18 @@ public record QueryUI(Node rootNode,
         VBox root = new VBox(10, topRow, bottomRow);
         root.getStylesheets().add(QueryUI.class.getResource("/query.css").toExternalForm());
 
+        depField.stop0().addListener((observable, oldValue, newValue) -> {
+            if(!oldValue.equals(newValue)){
+                depField.setTo(newValue);
+            }
+        });
+
+        arrField.stop0().addListener((observable, oldValue, newValue) -> {
+            if(!oldValue.equals(newValue)){
+                arrField.setTo(newValue);
+            }
+        });
+
         return new QueryUI(root,
                 depField.stop0(),
                 arrField.stop0(),
