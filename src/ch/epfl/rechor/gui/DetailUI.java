@@ -62,6 +62,30 @@ public record DetailUI (Node rootNode) {
         createStepsPane(journey.getValue(), circles, stepsPane);
         stepsPane.setId("legs");
 
+        Pane Annotation = getPane(circles);
+
+        Journey currentJourney = journey.getValue();
+
+        VBox Page = getPage(currentJourney, Annotation, stepsPane);
+
+        StackPane window = new StackPane(noJourney, Page);
+
+        journey.addListener((obs, oldJourney, newJourney) -> {
+                if(oldJourney != newJourney){
+                    circles.clear();
+                    stepsPane.getChildren().clear();
+                    createStepsPane(newJourney, circles, stepsPane);
+
+                    Annotation.requestLayout();
+                }
+        });
+        Page.setVisible(currentJourney != null);
+        noJourney.setVisible(currentJourney == null);
+        detailPane.setContent(window);
+        return new DetailUI(detailPane);
+    }
+
+    private static Pane getPane(List<Pair<Circle, Circle>> circles) {
         Pane Annotation = new Pane(){
             @Override
             protected void layoutChildren() {
@@ -86,27 +110,7 @@ public record DetailUI (Node rootNode) {
             }
         };
         Annotation.setId("annotations");
-
-        Journey currentJourney = journey.getValue();
-
-        VBox Page = getPage(currentJourney, Annotation, stepsPane);
-
-        StackPane window = new StackPane(noJourney, Page);
-
-        journey.addListener((obs, oldJourney, newJourney) -> {
-                if(oldJourney != newJourney){
-                    // Vider tout et reconstruire
-                    circles.clear();
-                    stepsPane.getChildren().clear();
-                    createStepsPane(newJourney, circles, stepsPane);
-
-                    Annotation.requestLayout();
-                }
-        });
-        Page.setVisible(currentJourney != null);
-        noJourney.setVisible(currentJourney == null);
-        detailPane.setContent(window);
-        return new DetailUI(detailPane);
+        return Annotation;
     }
 
     private static void createStepsPane(Journey journey, List<Pair<Circle,Circle>> circles, GridPane stepsPane) {

@@ -25,6 +25,9 @@ import java.util.List;
  * La classe représente la partie de l'interface graphique qui montre la vue d'ensemble des voyages.
  * @param rootNode nœud JavaFX à la racine de son graphe de scène.
  * @param selectedJourneyO valeur contenant le voyage sélectionné dans la vue d'ensemble.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
  */
 public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO) {
     /**
@@ -42,8 +45,8 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
         SimpleObjectProperty<Journey> selectedJourney = new SimpleObjectProperty<>();
 
-        allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
-            selectedJourney.set(newValue);
+        allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldSelected, newSelected) -> {
+            if(oldSelected != newSelected) selectedJourney.set(newSelected);
         });
 
         allJourney.addListener((obs, oldJourneys, newJourneys) -> {
@@ -52,24 +55,19 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
         hour.addListener((obs, oldTime, newTime) -> {
             List<Journey> journeys = allJourney.getValue();
-            if (journeys != null && !journeys.isEmpty()) {
+            if (!journeys.isEmpty()) {
                 int index = findSelectedJourney(journeys, newTime);
                 allElements.getSelectionModel().select(index);
                 allElements.scrollTo(index);
             }
         });
 
-        List<Journey> initialJourneys = allJourney.getValue();
-        if (initialJourneys != null) {
-            updateJourneyList(allElements, initialJourneys, hour.getValue());
-        }
-
         return new SummaryUI(allElements, selectedJourney);
     }
 
     private static void updateJourneyList(ListView<Journey> listView, List<Journey> journeys, LocalTime time) {
         listView.getItems().clear();
-        if (journeys != null && !journeys.isEmpty()) {
+        if (!journeys.isEmpty()) {
             listView.getItems().addAll(journeys);
             int index = findSelectedJourney(journeys, time);
             listView.getSelectionModel().select(index);
