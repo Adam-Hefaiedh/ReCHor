@@ -10,82 +10,103 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Popup;
 
+/**
+ * StopField représente un champ de texte permettant à l'utilisateur
+ * de rechercher un arrêt parmi ceux fournis par un StopIndex, avec
+ * affichage dynamique des suggestions dans une liste déroulante.
+ *
+ * @author Adam Taieb Hefaiedh (391029).
+ * @author El Hassan Lyoussi (398924).
+ */
 public record StopField(TextField textField, ObservableValue<String> stop0) {
 
-    public static StopField create (StopIndex stopIndex){
+    /**
+     * Crée un StopField connecté à un index d'arrêts donné.
+     * Ce champ propose des suggestions filtrées en temps réel
+     * et permet la sélection d'un nom d'arrêt.
+     *
+     * @param stopIndex l’index contenant les noms et alias d’arrêts
+     * @return un StopField interactif prêt à être inséré dans une scène JavaFX
+     */
+    public static StopField create(StopIndex stopIndex) {
 
-        Popup resultsWindow = new Popup();
-        resultsWindow.setHideOnEscape(false);
+        TextField textField = new TextField();
 
-        ListView<String> resultsList = new ListView<>();
-        resultsList.setFocusTraversable(false);
-        resultsList.setMaxHeight(240);
+        ListView<String> resultList = new ListView<>();
+        resultList.setFocusTraversable(false);
+        resultList.setMaxHeight(240);
 
-        resultsWindow.getContent().add(resultsList);
+        Popup popup = new Popup();
+        popup.setAutoHide(true);
+        popup.setHideOnEscape(true);
+        popup.getContent().add(resultList);
 
         SimpleStringProperty selectedName = new SimpleStringProperty("");
 
-        javafx.scene.control.TextField textField = new javafx.scene.control.TextField();
-
-
-        textField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            int index = resultsList.getSelectionModel().getSelectedIndex();
-            switch (event.getCode()) {
+        textField.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            int i = resultList.getSelectionModel().getSelectedIndex();
+            switch (e.getCode()) {
                 case UP -> {
-                    if (index > 0) {
-                        resultsList.getSelectionModel().select(index - 1);
-                        resultsList.scrollTo(index - 1);
-                        event.consume();
+                    if (i > 0) {
+                        resultList.getSelectionModel().select(i - 1);
+                        resultList.scrollTo(i - 1);
+                        e.consume();
                     }
                 }
                 case DOWN -> {
-                    if (index < resultsList.getItems().size()-1) {
-                        resultsList.getSelectionModel().select(index + 1);
-                        resultsList.scrollTo(index + 1);
-                        event.consume();
+                    if (i < resultList.getItems().size() - 1) {
+                        resultList.getSelectionModel().select(i + 1);
+                        resultList.scrollTo(i + 1);
+                        e.consume();
                     }
                 }
             }
         });
 
-        textField.focusedProperty().subscribe((newFocus) -> {
 
-            if (newFocus) {
-                textField.textProperty().subscribe((newQuery) -> {
-                        var stopsMatching = stopIndex.stopsMatching(newQuery, 30);
-                        resultsList.setItems(FXCollections.observableArrayList(stopsMatching));
-                        resultsList.getSelectionModel().selectFirst();
-                });
-                textField.boundsInLocalProperty().subscribe((newBounds) ->{
-                        Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());
-                        resultsWindow.setAnchorX(bounds.getMinX());
-                        resultsWindow.setAnchorY(bounds.getMaxY());
-                        resultsWindow.show(textField.getScene().getWindow());
-            });
+        textField.textProperty().addListener((obs, oldVal, newVal) -> {
+            var matches = stopIndex.stopsMatching(newVal, 30);
+            resultList.setItems(FXCollections.observableArrayList(matches));
+            resultList.getSelectionModel().selectFirst();
+        });
 
+
+        Runnable positionPopup = () -> {
+            Bounds b = textField.localToScreen(textField.getBoundsInLocal());
+            popup.setAnchorX(b.getMinX());
+            popup.setAnchorY(b.getMaxY());
+        };
+
+        textField.boundsInLocalProperty().addListener((obs, oldB, newB) -> positionPopup.run());
+
+
+        textField.focusedProperty().addListener((obs, oldF, isFocused) -> {
+            if (isFocused) {
+                positionPopup.run();
+                popup.show(textField.getScene().getWindow());
             } else {
-                textField.boundsInLocalProperty().subscribe((newValue) ->{
-                    resultsWindow.hide();
-                });
-
-                String selectedStop = resultsList.getSelectionModel().getSelectedItem();
-                if (selectedStop != null) {
-                    textField.setText(selectedStop);
-                    selectedName.set(selectedStop);
-                }
-                else {
+                popup.hide();
+                String selected = resultList.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    textField.setText(selected);
+                    selectedName.set(selected);
+                } else {
                     textField.setText("");
                     selectedName.set("");
                 }
             }
         });
+
         return new StopField(textField, selectedName);
     }
 
-    public void setTo (String stopName){
+    /**
+     * Définit manuellement la valeur du champ et met à jour la propriété observable.
+     *
+     * @param stopName le nom d’arrêt à définir
+     */
+    public void setTo(String stopName) {
         textField.setText(stopName);
         ((SimpleStringProperty) stop0).set(stopName);
     }
-
-
 }
