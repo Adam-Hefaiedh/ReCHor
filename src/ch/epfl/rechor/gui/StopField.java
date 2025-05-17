@@ -73,14 +73,16 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
         Runnable positionPopup = () -> {
             Bounds b = textField.localToScreen(textField.getBoundsInLocal());
+            if(b != null){
             popup.setAnchorX(b.getMinX());
             popup.setAnchorY(b.getMaxY());
+            }
         };
 
         textField.boundsInLocalProperty().subscribe((newB) -> positionPopup.run());
 
 
-        textField.focusedProperty().subscribe((isFocused) -> {
+        textField.focusedProperty().addListener((obs, oldF, isFocused) -> {
             if (isFocused) {
                 positionPopup.run();
                 popup.show(textField.getScene().getWindow());
