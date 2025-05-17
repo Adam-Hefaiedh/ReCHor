@@ -48,37 +48,25 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
             }
         });
 
-        textField.focusedProperty().addListener((obsFocus, oldFocus, newFocus) -> {
+        textField.focusedProperty().subscribe((newFocus) -> {
 
             if (newFocus) {
-                var stopsMatching = stopIndex.stopsMatching(textField.textProperty().get(), 30);
-                resultsList.setItems(FXCollections.observableArrayList(stopsMatching));
-                resultsList.getSelectionModel().selectFirst();
-                textField.textProperty().addListener((obsQuery, oldQuery, newQuery) -> {
-                    if (!newQuery.equals(oldQuery)){
-                        var stopsMatchinge = stopIndex.stopsMatching(newQuery, 30);
-                        resultsList.setItems(FXCollections.observableArrayList(stopsMatchinge));
+                textField.textProperty().subscribe((newQuery) -> {
+                        var stopsMatching = stopIndex.stopsMatching(newQuery, 30);
+                        resultsList.setItems(FXCollections.observableArrayList(stopsMatching));
                         resultsList.getSelectionModel().selectFirst();
-                    }
                 });
-                Bounds boundes = textField.localToScreen(textField.getBoundsInLocal());
-                resultsWindow.setAnchorX(boundes.getMinX());
-                resultsWindow.setAnchorY(boundes.getMaxY());
-                resultsWindow.show(textField.getScene().getWindow());
-                textField.boundsInLocalProperty().addListener((observable, oldBounds, newBounds) ->{
-                    if (newBounds != oldBounds) {
+                textField.boundsInLocalProperty().subscribe((newBounds) ->{
                         Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());
                         resultsWindow.setAnchorX(bounds.getMinX());
                         resultsWindow.setAnchorY(bounds.getMaxY());
                         resultsWindow.show(textField.getScene().getWindow());
-                    }
             });
 
             } else {
-                textField.boundsInLocalProperty().addListener((observable, oldValue, newValue) ->{
+                textField.boundsInLocalProperty().subscribe((newValue) ->{
                     resultsWindow.hide();
                 });
-                resultsWindow.hide();
 
                 String selectedStop = resultsList.getSelectionModel().getSelectedItem();
                 if (selectedStop != null) {

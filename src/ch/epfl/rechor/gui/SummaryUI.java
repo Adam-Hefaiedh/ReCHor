@@ -45,15 +45,13 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
         SimpleObjectProperty<Journey> selectedJourney = new SimpleObjectProperty<>();
 
-        allElements.getSelectionModel().selectedItemProperty().addListener((obs, oldSelected, newSelected) -> {
-            if(oldSelected != newSelected) selectedJourney.set(newSelected);
-        });
+        allElements.getSelectionModel().selectedItemProperty().subscribe(selectedJourney::set);
 
-        allJourney.addListener((obs, oldJourneys, newJourneys) -> {
+        allJourney.subscribe((newJourneys) -> {
             updateJourneyList(allElements, newJourneys, hour.getValue());
         });
 
-        hour.addListener((obs, oldTime, newTime) -> {
+        hour.subscribe((newTime) -> {
             List<Journey> journeys = allJourney.getValue();
             if (!journeys.isEmpty()) {
                 int index = findSelectedJourney(journeys, newTime);
@@ -109,7 +107,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 });
             }
         };
-        
+
 
 
         public journeyCellList()
@@ -163,7 +161,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
             }
         }
     }
-    
+
     private static int findSelectedJourney(List<Journey> allJourney, LocalTime hour)
     {
         int id = -1;

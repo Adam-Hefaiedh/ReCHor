@@ -59,26 +59,23 @@ public record DetailUI (Node rootNode) {
         List<Pair<Circle,Circle>> circles = new ArrayList<>();
 
         GridPane stepsPane = new GridPane();
-        createStepsPane(journey.getValue(), circles, stepsPane);
         stepsPane.setId("legs");
 
         Pane Annotation = getPane(circles);
+
+        journey.subscribe((newJourney) -> {
+                    circles.clear();
+                    stepsPane.getChildren().clear();
+                    createStepsPane(newJourney, circles, stepsPane);
+
+                    Annotation.requestLayout();
+        });
 
         Journey currentJourney = journey.getValue();
 
         VBox Page = getPage(currentJourney, Annotation, stepsPane);
 
         StackPane window = new StackPane(noJourney, Page);
-
-        journey.addListener((obs, oldJourney, newJourney) -> {
-                if(oldJourney != newJourney){
-                    circles.clear();
-                    stepsPane.getChildren().clear();
-                    createStepsPane(newJourney, circles, stepsPane);
-
-                    Annotation.requestLayout();
-                }
-        });
         Page.setVisible(currentJourney != null);
         noJourney.setVisible(currentJourney == null);
         detailPane.setContent(window);
