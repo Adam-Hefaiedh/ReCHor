@@ -64,7 +64,7 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         });
 
 
-        textField.textProperty().addListener((obs, oldVal, newVal) -> {
+        textField.textProperty().subscribe((newVal) -> {
             var matches = stopIndex.stopsMatching(newVal, 30);
             resultList.setItems(FXCollections.observableArrayList(matches));
             resultList.getSelectionModel().selectFirst();
@@ -77,10 +77,10 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
             popup.setAnchorY(b.getMaxY());
         };
 
-        textField.boundsInLocalProperty().addListener((obs, oldB, newB) -> positionPopup.run());
+        textField.boundsInLocalProperty().subscribe((newB) -> positionPopup.run());
 
 
-        textField.focusedProperty().addListener((obs, oldF, isFocused) -> {
+        textField.focusedProperty().subscribe((isFocused) -> {
             if (isFocused) {
                 positionPopup.run();
                 popup.show(textField.getScene().getWindow());
