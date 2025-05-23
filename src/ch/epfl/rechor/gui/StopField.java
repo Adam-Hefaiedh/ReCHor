@@ -37,7 +37,7 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         resultList.setMaxHeight(240);
 
         Popup popup = new Popup();
-        popup.setAutoHide(true);
+        popup.setAutoHide(false);
         popup.setHideOnEscape(true);
         popup.getContent().add(resultList);
 

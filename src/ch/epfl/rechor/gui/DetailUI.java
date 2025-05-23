@@ -174,17 +174,18 @@ public record DetailUI (Node rootNode) {
     private static void intermediateStopView(Journey.Leg leg, GridPane stepsPane, AtomicInteger rowIndex){
         Accordion interStops = new Accordion();
         TitledPane titledPane = new TitledPane();
-        titledPane.setText(leg.intermediateStops().size() + " arrêts, " + FormatterFr.formatDuration(leg.duration()));
+        String title = leg.intermediateStops().size() > 1 ? " arrêts, " : " arrêt, ";
+        titledPane.setText(leg.intermediateStops().size() + title + FormatterFr.formatDuration(leg.duration()));
 
         GridPane interStopsGrid = new GridPane();
         interStopsGrid.setHgap(5);
         interStopsGrid.setVgap(2);
-        AtomicInteger rowIndex2 = new AtomicInteger();
+        AtomicInteger intermediateRow = new AtomicInteger();
         leg.intermediateStops().forEach((i) -> {
-            interStopsGrid.add(new Text(FormatterFr.formatTime(i.arrTime())), 0, rowIndex2.get());
-            interStopsGrid.add(new Text(FormatterFr.formatTime(i.depTime())), 1, rowIndex2.get());
-            interStopsGrid.add(new Text(i.stop().name()), 2, rowIndex2.get());
-            rowIndex2.getAndIncrement();
+            interStopsGrid.add(new Text(FormatterFr.formatTime(i.arrTime())), 0, intermediateRow.get());
+            interStopsGrid.add(new Text(FormatterFr.formatTime(i.depTime())), 1, intermediateRow.get());
+            interStopsGrid.add(new Text(i.stop().name()), 2, intermediateRow.get());
+            intermediateRow.getAndIncrement();
         });
 
         titledPane.setContent(interStopsGrid);
