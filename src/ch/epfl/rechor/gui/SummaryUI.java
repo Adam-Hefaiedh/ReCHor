@@ -4,6 +4,7 @@ import ch.epfl.rechor.FormatterFr;
 import ch.epfl.rechor.journey.Journey;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -89,6 +90,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 setPrefSize(0,0);
                 Line line = new Line(5,getHeight()/2,getWidth()-5,getHeight()/2);
                 getChildren().add(line);
+                Group circleGroup  = new Group();
                 Circle depCircle = new Circle(3);
                 depCircle.setCenterX(line.getStartX());
                 depCircle.setCenterY(line.getStartY());
@@ -97,14 +99,15 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
                 arrCircle.setCenterX(line.getEndX());
                 arrCircle.setCenterY(line.getEndY());
                 arrCircle.getStyleClass().add("dep-arr");
-                getChildren().add(depCircle);
-                getChildren().add(arrCircle);
+                circleGroup.getChildren().add(depCircle);
+                circleGroup.getChildren().add(arrCircle);
                 circle.forEach(middleCircle -> {
                         double position = (double) middleCircle.getUserData()*(getWidth()-2*5) + 5;
                         middleCircle.setCenterX(position);
                         middleCircle.setCenterY(getHeight()/2);
-                        getChildren().add(middleCircle);
+                        circleGroup.getChildren().add(middleCircle);
                 });
+                getChildren().add(circleGroup);
             }
         };
 

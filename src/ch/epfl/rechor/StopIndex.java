@@ -137,19 +137,9 @@ public class StopIndex {
         StringBuilder regex = new StringBuilder();
         for (char ch : sub.toCharArray()) {
             char charLowerCase = Character.toLowerCase(ch);
-            if (charRegularExpressions.containsKey(charLowerCase)) {
+            if (charRegularExpressions.containsKey(charLowerCase)&& !hasUpper) {
                 String variants = charRegularExpressions.get(charLowerCase);
-                if (hasUpper) {
-                    // match exact : on met minuscule ET majuscule de chaque variante
-                    StringBuilder sb = new StringBuilder("[");
-                    for (char v : variants.toCharArray()) {
-                        sb.append(v).append(Character.toUpperCase(v));
-                    }
-                    sb.append("]");
-                    regex.append(sb);
-                } else {
-                    regex.append("[").append(variants).append("]");
-                }
+                regex.append("[").append(variants).append("]");
             } else {
                 regex.append(Pattern.quote(String.valueOf(ch)));
             }
