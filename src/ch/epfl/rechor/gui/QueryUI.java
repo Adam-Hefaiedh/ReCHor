@@ -3,9 +3,11 @@ package ch.epfl.rechor.gui;
 import ch.epfl.rechor.StopIndex;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.util.converter.LocalTimeStringConverter;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,7 +29,8 @@ public record QueryUI(Node rootNode,
                       ObservableValue<String> depStopO,
                       ObservableValue<String> arrStopO,
                       ObservableValue<LocalDate> dateO,
-                      ObservableValue<LocalTime> timeO) {
+                      ObservableValue<LocalTime> timeO,
+                      Button research) {
 
     /**
      * Permet de créer le graphe de scène de l'interface de requête
@@ -35,6 +38,8 @@ public record QueryUI(Node rootNode,
      * @return une instance de QueryUI contenant le nœud JavaFX qui se trouve à sa racine
      */
     public static QueryUI create(StopIndex stopIndex) {
+
+
 
         StopField depField = StopField.create(stopIndex);
         StopField arrField = StopField.create(stopIndex);
@@ -70,40 +75,50 @@ public record QueryUI(Node rootNode,
         ObjectProperty<LocalDate> dateProp = datePicker.valueProperty();
         ObservableValue<LocalTime> timeProp = tf.valueProperty();
 
+        Button searchButton = new Button();
+        searchButton.setId("search-button");
+        searchButton.setText("🔍");
+
+        double r = 30;
+        searchButton.setShape(new Circle(r));
+        searchButton.setMinSize(2*r, 2*r);
+        searchButton.setPrefSize(2*r, 2*r);
+        searchButton.setMaxSize(2*r, 2*r);
+
+        searchButton.getStyleClass().add("search-circle-button");
+
         HBox topRow = new HBox(10,
                 new Label("Départ\u202f:"), depField.textField(),
                 swapButton,
                 new Label("Arrivée\u202f:"), arrField.textField()
         );
 
-
         HBox bottomRow = new HBox(10,
                 new Label("Date\u202f:"), datePicker,
                 new Label("Heure\u202f:"), timeField
         );
 
-        VBox root = new VBox(10, topRow, bottomRow);
+        BorderPane mainLayout = new BorderPane();
+        VBox fieldsContainer = new VBox(10, topRow, bottomRow);
+        mainLayout.setCenter(fieldsContainer);
+
+        StackPane buttonContainer = new StackPane(searchButton);
+        buttonContainer.setPadding(new Insets(0, 150, 0, 10));
+        mainLayout.setRight(buttonContainer);
+        VBox root = new VBox(mainLayout);
         root.getStylesheets().add(Objects.requireNonNull(QueryUI.class.getResource("/query.css")).toExternalForm());
 
-        depField.stop0().addListener((obs, oldStop, newStop) -> {
-            if(!oldStop.equals(newStop)){
-                depField.setTo(newStop);
-            }
-        });
 
-        arrField.stop0().addListener((obs, oldStop, newStop) -> {
-            if(!oldStop.equals(newStop)){
-                arrField.setTo(newStop);
-            }
-        });
-
+        root.setId("root");
         return new QueryUI(root,
                 depField.stop0(),
                 arrField.stop0(),
                 dateProp,
-                timeProp
+                timeProp,
+                searchButton
         );
     }
+
 }
 
 

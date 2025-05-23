@@ -152,7 +152,6 @@ public record DetailUI (Node rootNode) {
                         rowIndex.getAndIncrement();
                     }
 
-
                     Text arrTime = new Text(FormatterFr.formatTime(leg.arrTime()));
                     Circle arrCircle = new Circle(3);
                     Text arrStop = new Text(leg.arrStop().name());
@@ -179,12 +178,12 @@ public record DetailUI (Node rootNode) {
         GridPane interStopsGrid = new GridPane();
         interStopsGrid.setHgap(5);
         interStopsGrid.setVgap(2);
-        AtomicInteger rowIndex2 = new AtomicInteger();
+        AtomicInteger intermediateRow = new AtomicInteger();
         leg.intermediateStops().forEach((i) -> {
-            interStopsGrid.add(new Text(FormatterFr.formatTime(i.arrTime())), 0, rowIndex2.get());
-            interStopsGrid.add(new Text(FormatterFr.formatTime(i.depTime())), 1, rowIndex2.get());
-            interStopsGrid.add(new Text(i.stop().name()), 2, rowIndex2.get());
-            rowIndex2.getAndIncrement();
+            interStopsGrid.add(new Text(FormatterFr.formatTime(i.arrTime())), 0, intermediateRow.get());
+            interStopsGrid.add(new Text(FormatterFr.formatTime(i.depTime())), 1, intermediateRow.get());
+            interStopsGrid.add(new Text(i.stop().name()), 2, intermediateRow.get());
+            intermediateRow.getAndIncrement();
         });
 
         titledPane.setContent(interStopsGrid);

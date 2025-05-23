@@ -1,3 +1,23 @@
+#root {
+    -fx-background-color: #105b99;
+}
+
+.search-circle-button {
+    -fx-background-color: #0066cc;
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);
+}
+
+.search-circle-button:hover {
+    -fx-background-color: #0099ff;
+    -fx-cursor: hand;
+}
+
+HBox Label {
+    -fx-text-fill: white;
+}
+
 HBox {
     -fx-spacing: 8;
     -fx-padding: 4;
@@ -11,3 +31,4 @@ HBox {
 #time {
     -fx-pref-column-count: 5;
 }
+

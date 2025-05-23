@@ -13,11 +13,23 @@ import ch.epfl.rechor.timetable.mapped.FileTimeTable;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.nio.file.Path;
@@ -25,6 +37,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * La classe principale du projet liant toutes les interfaces.
@@ -33,8 +47,10 @@ import java.util.List;
  * @author El Hassan Lyoussi (398924).
  */
 public class Main extends Application {
-    private ObservableValue<List<Journey>> journeys0;
+    private final ObjectProperty<List<Journey>> journeysProperty = new SimpleObjectProperty<>(Collections.emptyList());
     private Profile cachedProfile;
+    private final BooleanProperty loading = new SimpleBooleanProperty(false);
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     /**
      * Lance l'interface de voyage à l'aide de la methode launch
@@ -59,6 +75,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         TimeTable timeTable = new CachedTimeTable(
                 FileTimeTable.in(Path.of("timetable")));
+        Router router = new Router(timeTable);
         Stations stations = timeTable.stations();
         StationAliases aliasesStation = timeTable.stationAliases();
         List<String> stationName = new ArrayList<>();
@@ -73,47 +90,83 @@ public class Main extends Application {
 
         StopIndex stopIndex = new StopIndex(stationName, aliases);
         QueryUI queryUI = QueryUI.create(stopIndex);
-
-        ObservableValue<String> arrStop0 = queryUI.arrStopO();
-        ObservableValue<String> depStop0 = queryUI.depStopO();
-        ObservableValue<LocalDate> date0 = queryUI.dateO();
-
-
-        journeys0 = Bindings.createObjectBinding(() ->
-        {
-
-            int arrStationId = stationId(stations, arrStop0.getValue());
-            LocalDate date = date0.getValue();
-
-            int depStationId = stationId(stations, depStop0.getValue());
-            if(cachedProfile!= null && cachedProfile.arrStationId() == arrStationId && cachedProfile.date().equals(date)){
-                return JourneyExtractor
-                        .journeys(cachedProfile, depStationId);
-            }
-            Router router = new Router(timeTable);
-            List<Journey> journeys = Collections.emptyList();
+        Image loadingGif = new Image("loading.gif");
+        ImageView loadingImageView = new ImageView(loadingGif);
+        loadingImageView.setFitWidth(100);
+        loadingImageView.setFitHeight(100);
+        loadingImageView.setPreserveRatio(true);
+        Label loadingLabel = new Label("Chargement en cours...");
+        VBox loadingBox = new VBox(10, loadingImageView, loadingLabel);
+        loadingBox.setAlignment(Pos.CENTER);
+        loadingBox.visibleProperty().bind(loading);
 
 
-            if(arrStationId != -1) {
-                cachedProfile = router.profile(date, arrStationId);
-                journeys= JourneyExtractor
-                        .journeys(cachedProfile, depStationId);
-            }
-            return journeys;
-            },arrStop0,depStop0, date0
-       );
+        Runnable searchListener = () -> {
+
+                String arrStopName = queryUI.arrStopO().getValue();
+                String depStopName = queryUI.depStopO().getValue();
+                LocalDate date = queryUI.dateO().getValue();
+
+                if (arrStopName.isEmpty() ||
+                        depStopName.isEmpty()) {
+                    journeysProperty.set(Collections.emptyList());
+                    return;
+                }
+
+                int arrStationId = stationId(stations, arrStopName);
+                int depStationId = stationId(stations, depStopName);
+
+                if (arrStationId == -1 || depStationId == -1) {
+                    journeysProperty.set(Collections.emptyList());
+                    return;
+                }
+
+                if (cachedProfile != null &&
+                        cachedProfile.arrStationId() == arrStationId &&
+                        cachedProfile.date().equals(date)) {
+                    List<Journey> journeys = JourneyExtractor.journeys(cachedProfile, depStationId);
+                    journeysProperty.set(journeys);
+                    return;
+                }
+
+                loading.set(true);
+                journeysProperty.set(Collections.emptyList());
+
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call(){
+                        cachedProfile = router.profile(date, arrStationId);
+                        List<Journey> journeys = JourneyExtractor.journeys(cachedProfile, depStationId);
+
+                        Platform.runLater(() -> {
+                            journeysProperty.set(journeys);
+                            loading.set(false);
+                        });
+
+                        return null;
+                    }
+                };
+                executorService.submit(task);
+
+
+
+
+        };
+
+        queryUI.research().setOnAction(event -> searchListener.run());
+
+
 
         ObservableValue<LocalTime> depTimeO = queryUI.timeO();
-        SummaryUI summaryUI = SummaryUI.create(journeys0, depTimeO);
-        DetailUI detailUI = DetailUI.create(summaryUI.selectedJourneyO());
-        SplitPane pane = new SplitPane(summaryUI.rootNode(),detailUI.rootNode());
-        summaryUI.selectedJourneyO().addListener((obs, oldJourney, newJourney) -> {
-            if(oldJourney != newJourney){
-                DetailUI updatedDetailUI = DetailUI.create(summaryUI.selectedJourneyO());
-                pane.getItems().set(1,updatedDetailUI.rootNode());
-            }
+        SummaryUI summaryUI = SummaryUI.create(journeysProperty, depTimeO);
+        Node summaryUi = summaryUI.rootNode();
+        StackPane summaryPane = new StackPane(summaryUi, loadingBox);
+        SplitPane pane = new SplitPane(summaryPane);
+        summaryUI.selectedJourneyO().subscribe((newJourney) -> {
+                DetailUI detailUI = DetailUI.create(summaryUI.selectedJourneyO());
+                if(pane.getItems().size() < 2) pane.getItems().add(detailUI.rootNode());
+                else pane.getItems().set(1,detailUI.rootNode());
         });
-
        BorderPane root = new BorderPane();
 
        root.setCenter(pane);
@@ -123,6 +176,8 @@ public class Main extends Application {
        stage.setMinWidth(800);
        stage.setMinHeight(600);
        stage.setTitle("ReCHor");
+       Image logo = new Image("logo.png");
+       stage.getIcons().add(logo);
        stage.show();
         Platform.runLater(() ->
                 scene.lookup("#depStop").requestFocus());

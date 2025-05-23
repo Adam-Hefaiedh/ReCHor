@@ -37,7 +37,7 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         resultList.setMaxHeight(240);
 
         Popup popup = new Popup();
-        popup.setAutoHide(true);
+        popup.setAutoHide(false);
         popup.setHideOnEscape(true);
         popup.getContent().add(resultList);
 
@@ -60,7 +60,19 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
                         e.consume();
                     }
                 }
+                case TAB -> {
+                    popup.hide();
+                    String selected = resultList.getSelectionModel().getSelectedItem();
+                    if (selected != null) {
+                        textField.setText(selected);
+                        selectedName.set(selected);
+                    } else {
+                        textField.setText("");
+                        selectedName.set("");
+                    }
+                }
             }
+
         });
 
 
@@ -86,19 +98,8 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
             if (isFocused) {
                 positionPopup.run();
                 popup.show(textField.getScene().getWindow());
-            } else {
-                popup.hide();
-                String selected = resultList.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    textField.setText(selected);
-                    selectedName.set(selected);
-                } else {
-                    textField.setText("");
-                    selectedName.set("");
-                }
             }
         });
-
         return new StopField(textField, selectedName);
     }
 
