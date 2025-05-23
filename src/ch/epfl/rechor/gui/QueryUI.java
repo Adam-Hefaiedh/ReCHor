@@ -39,8 +39,6 @@ public record QueryUI(Node rootNode,
      */
     public static QueryUI create(StopIndex stopIndex) {
 
-
-
         StopField depField = StopField.create(stopIndex);
         StopField arrField = StopField.create(stopIndex);
 
@@ -93,6 +91,7 @@ public record QueryUI(Node rootNode,
                 new Label("Arrivée\u202f:"), arrField.textField()
         );
 
+
         HBox bottomRow = new HBox(10,
                 new Label("Date\u202f:"), datePicker,
                 new Label("Heure\u202f:"), timeField
@@ -118,7 +117,6 @@ public record QueryUI(Node rootNode,
                 searchButton
         );
     }
-
 }
 
 
