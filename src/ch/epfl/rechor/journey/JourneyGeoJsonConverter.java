@@ -12,6 +12,8 @@ import java.util.List;
  * @author El Hassan Lyoussi (398924).
  */
 public class JourneyGeoJsonConverter {
+    private static final double ROUNDING_MULTIPLICATOR = 100000;
+
     private JourneyGeoJsonConverter(){}
 
     /**
@@ -32,11 +34,11 @@ public class JourneyGeoJsonConverter {
         List<Journey.Leg> steps = journey.legs();
         List<Json> ride = new ArrayList<>();
         steps.forEach((l) -> {
-            ride.add(new Json.JArray(List.of(new Json.JNumber(l.depStop().longitude()),
-                    new Json.JNumber(l.depStop().latitude()))));
+            ride.add(new Json.JArray(List.of(new Json.JNumber(roundToFive(l.depStop().longitude())),
+                    new Json.JNumber(roundToFive(l.depStop().longitude())))));
             l.intermediateStops().forEach((i) ->
-                ride.add(new Json.JArray(List.of(new Json.JNumber(i.stop().longitude()),
-                        new Json.JNumber(i.stop().latitude()))))
+                ride.add(new Json.JArray(List.of(new Json.JNumber(roundToFive(i.stop().longitude())),
+                        new Json.JNumber(roundToFive(i.stop().latitude())))))
             );
         });
         ride.add(new Json.JArray(List.of(new Json.JNumber(steps.getLast().arrStop().longitude()),
@@ -44,4 +46,10 @@ public class JourneyGeoJsonConverter {
 
         return ride;
     }
+
+    private static double roundToFive(double value){
+        return Math.round(value*ROUNDING_MULTIPLICATOR)/ROUNDING_MULTIPLICATOR;
+    }
+
+
 }

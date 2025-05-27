@@ -41,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author El Hassan Lyoussi (398924).
  */
 public record DetailUI (Node rootNode) {
+    private final static Desktop DESKTOP = Desktop.getDesktop();
 
     /**
      * Permet de créer le graphe de scène
@@ -113,7 +114,7 @@ public record DetailUI (Node rootNode) {
     private static void createStepsPane(Journey journey, List<Pair<Circle,Circle>> circles, GridPane stepsPane) {
         List<Journey.Leg> steps = new ArrayList<>();
         if(journey != null)  steps = journey.legs();
-        AtomicInteger rowIndex= new AtomicInteger(0);
+        AtomicInteger rowIndex= new AtomicInteger();
         steps.forEach((leg) -> {
             switch (leg) {
                 case Journey.Leg.Foot f : {
@@ -207,8 +208,12 @@ public record DetailUI (Node rootNode) {
         StackPane Page = new StackPane(Annotation, stepsPane);
         Button map = createFunctionnalButton(event -> {
             try {
-                URI link = new URI("https","umap.osm.ch","/fr/map", "data="+ JourneyGeoJsonConverter.toGeoJSON(journey), null);
-                Desktop.getDesktop().browse(link);
+                URI link = new URI("https",
+                        "umap.osm.ch",
+                        "/fr/map",
+                        "data="
+                                + JourneyGeoJsonConverter.toGeoJSON(journey), null);
+                DESKTOP.browse(link);
             } catch (URISyntaxException | IOException e) {
                 throw new RuntimeException(e);
             }
@@ -218,8 +223,9 @@ public record DetailUI (Node rootNode) {
             try {
                 FileChooser file = new FileChooser();
                 file.setTitle("format iCalendar");
-                file.setInitialFileName("voyage_" + journey.depTime().toLocalDate() + ".ics");
+                file.setInitialFileName("voyage_" + journey.depTime().toLocalDate());
 
+                file.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers iCalendar(.ics)", ".ics"));
                 File selectedFile = file.showSaveDialog(Page.getScene().getWindow());
                 Files.writeString(selectedFile.toPath(), JourneyIcalConverter.toIcalendar(journey));
             } catch(IOException e){

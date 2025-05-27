@@ -1,5 +1,7 @@
 package ch.epfl.cs108;
 
+import ch.epfl.Bonus;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,12 +32,12 @@ public final class Submit {
     // CONFIGURATION
     // -------------
     // Jeton du premier membre du groupe
-    private static final String TOKEN_1 = "okeeg4Be";
+    private static final String TOKEN_1 = "eeYai0ah";
     // Jeton du second membre (identique au premier pour les personnes travaillant seules)
-    private static final String TOKEN_2 = "cieh2Ahw";
+    private static final String TOKEN_2 = "Geepueb0";
     // Noms des éventuels fichiers Java additionnels à inclure (p.ex. "MyClass.java")
     private static final List<String> ADDITIONAL_FILES =
-            List.of();
+            List.of("src/ch/epfl/Bonus.java");
     // -------------
 
     private static final String ZIP_ENTRY_NAME_PREFIX = "CS108/";

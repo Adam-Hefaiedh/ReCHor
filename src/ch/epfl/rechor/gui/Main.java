@@ -84,8 +84,8 @@ public class Main extends Application {
 
             int arrStationId = stationId(stations, arrStop0.getValue());
             LocalDate date = date0.getValue();
-
             int depStationId = stationId(stations, depStop0.getValue());
+
             if(cachedProfile!= null && cachedProfile.arrStationId() == arrStationId && cachedProfile.date().equals(date)){
                 return JourneyExtractor
                         .journeys(cachedProfile, depStationId);

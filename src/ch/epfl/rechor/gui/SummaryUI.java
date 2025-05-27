@@ -48,9 +48,7 @@ public record SummaryUI(Node rootNode, ObservableValue<Journey> selectedJourneyO
 
         allElements.getSelectionModel().selectedItemProperty().subscribe(selectedJourney::set);
 
-        allJourney.subscribe((newJourneys) -> {
-            updateJourneyList(allElements, newJourneys, hour.getValue());
-        });
+        allJourney.subscribe((newJourneys) -> updateJourneyList(allElements, newJourneys, hour.getValue()));
 
         hour.subscribe((newTime) -> {
             List<Journey> journeys = allJourney.getValue();
