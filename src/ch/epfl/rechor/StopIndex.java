@@ -15,6 +15,10 @@ import java.util.regex.Pattern;
  */
 public class StopIndex {
 
+    private static final int COEFF_LENGTH      = 100;
+    private static final int FIRST_WORD_COEFF  = 4;
+    private static final int END_WORD_COEFF    = 2;
+
     /**
      * Table de correspondance entre une lettre non accentuée et toutes
      * ses variantes accentuées acceptées dans les expressions régulières.
@@ -166,16 +170,16 @@ public class StopIndex {
         int baseLen = sub.length();
         int nameLen = src.length();
 
-        int baseScore = (baseLen * 100) / nameLen;
+        int baseScore = (baseLen * COEFF_LENGTH) / nameLen;
 
         int mult = 1;
 
         if (start == 0 || !Character.isLetter(src.charAt(start-1))) {
-            mult *= 4;
+            mult *= FIRST_WORD_COEFF;
         }
 
         if (end == nameLen || !Character.isLetter(src.charAt(end))) {
-            mult *= 2;
+            mult *= END_WORD_COEFF;
         }
 
         return baseScore * mult;

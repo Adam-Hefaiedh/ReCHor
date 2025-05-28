@@ -20,6 +20,8 @@ import javafx.stage.Popup;
  */
 public record StopField(TextField textField, ObservableValue<String> stop0) {
 
+    private static final int MAX_REQUESTS = 30;
+
     /**
      * Crée un StopField connecté à un index d'arrêts donné.
      * Ce champ propose des suggestions filtrées en temps réel
@@ -77,7 +79,7 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
 
 
         textField.textProperty().subscribe((newVal) -> {
-            var matches = stopIndex.stopsMatching(newVal, 30);
+            var matches = stopIndex.stopsMatching(newVal, MAX_REQUESTS);
             resultList.setItems(FXCollections.observableArrayList(matches));
             resultList.getSelectionModel().selectFirst();
         });
@@ -94,7 +96,7 @@ public record StopField(TextField textField, ObservableValue<String> stop0) {
         textField.boundsInLocalProperty().subscribe((newB) -> positionPopup.run());
 
 
-        textField.focusedProperty().addListener((obs, oldF, isFocused) -> {
+        textField.focusedProperty().addListener((obs, oldFocus , isFocused) -> {
             if (isFocused) {
                 positionPopup.run();
                 popup.show(textField.getScene().getWindow());

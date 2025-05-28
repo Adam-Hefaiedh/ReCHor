@@ -31,6 +31,8 @@ public record QueryUI(Node rootNode,
                       ObservableValue<LocalDate> dateO,
                       ObservableValue<LocalTime> timeO,
                       Button research) {
+    private static final DateTimeFormatter OUTPUT_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter INPUT_FORMATTER  = DateTimeFormatter.ofPattern("[H:mm][HH:mm]");
 
     /**
      * Permet de créer le graphe de scène de l'interface de requête
@@ -45,8 +47,8 @@ public record QueryUI(Node rootNode,
         depField.textField().setId("depStop");
         arrField.textField().setId("arrStop");
 
-        depField.textField().setPromptText("Départ\u202f:");
-        arrField.textField().setPromptText("Arrivée\u202f:");
+        depField.textField().setPromptText("Nom de l'arrêt de départ");
+        arrField.textField().setPromptText("Nom de l'arrêt d'arrivée");
 
 
         Button swapButton = new Button("⇄");
@@ -61,8 +63,8 @@ public record QueryUI(Node rootNode,
         DatePicker datePicker = new DatePicker(LocalDate.now());
         datePicker.setId("date");
 
-        DateTimeFormatter displayFmt = DateTimeFormatter.ofPattern("HH:mm");
-        DateTimeFormatter parseFmt = DateTimeFormatter.ofPattern("[H:mm][HH:mm]");
+        DateTimeFormatter displayFmt = OUTPUT_FORMATTER;
+        DateTimeFormatter parseFmt = INPUT_FORMATTER;
         LocalTimeStringConverter converter = new LocalTimeStringConverter(displayFmt, parseFmt);
 
         TextFormatter<LocalTime> tf = new TextFormatter<>(converter, LocalTime.now());
@@ -104,8 +106,8 @@ public record QueryUI(Node rootNode,
         StackPane buttonContainer = new StackPane(searchButton);
         buttonContainer.setPadding(new Insets(0, 150, 0, 10));
         mainLayout.setRight(buttonContainer);
-        VBox root = new VBox(mainLayout);
-        root.getStylesheets().add(Objects.requireNonNull(QueryUI.class.getResource("/query.css")).toExternalForm());
+        VBox root = new VBox(10, topRow, bottomRow);
+        root.getStylesheets().add("query.css");
 
 
         root.setId("root");

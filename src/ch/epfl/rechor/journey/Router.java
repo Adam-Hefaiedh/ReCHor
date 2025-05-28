@@ -40,15 +40,15 @@ public record Router(TimeTable timeTable) {
             int tripId = connections.tripId(connId);
             int tripPos = connections.tripPos(connId);
 
-            ParetoFront.Builder f = new ParetoFront.Builder();
+            ParetoFront.Builder frontBuild = new ParetoFront.Builder();
 
-            option1_walkToDestination(f, arrStopId, arrMins, walkable, connId);
-            option2_continueInTrip(f, profileBuilder, tripId);
-            option3_changeVehicle(f, profileBuilder, arrStopId, arrMins, connId);
+            option1_walkToDestination(frontBuild, arrStopId, arrMins, walkable, connId);
+            option2_continueInTrip(frontBuild, profileBuilder, tripId);
+            option3_changeVehicle(frontBuild, profileBuilder, arrStopId, arrMins, connId);
 
-            if (!f.isEmpty()) {
-                updateTripFrontier(profileBuilder, f, tripId);
-                updateStationFrontiers(profileBuilder, f, transfers, connections,
+            if (!frontBuild.isEmpty()) {
+                updateTripFrontier(profileBuilder, frontBuild, tripId);
+                updateStationFrontiers(profileBuilder, frontBuild, transfers, connections,
                         depStopId, depMins, connId, tripPos);
             }
         }
@@ -56,23 +56,23 @@ public record Router(TimeTable timeTable) {
     }
 
 
-    private void option1_walkToDestination(ParetoFront.Builder f, int arrStopId, int arrMins,
+    private void option1_walkToDestination(ParetoFront.Builder frontBuild, int arrStopId, int arrMins,
                                            int[] walkable, int connectionId) {
         int walkMinutes = walkable[arrStopId];
         if (walkMinutes != -1) {
             int payload = Bits32_24_8.pack(connectionId, 0);
-            f.add(arrMins + walkMinutes, 0, payload);
+            frontBuild.add(arrMins + walkMinutes, 0, payload);
         }
     }
 
-    private void option2_continueInTrip(ParetoFront.Builder f, Profile.Builder p, int tripId) {
-        ParetoFront.Builder tripFront = p.forTrip(tripId);
-        if (tripFront != null) f.addAll(tripFront);
+    private void option2_continueInTrip(ParetoFront.Builder frontBuild, Profile.Builder profile, int tripId) {
+        ParetoFront.Builder tripFront = profile.forTrip(tripId);
+        if (tripFront != null) frontBuild.addAll(tripFront);
     }
 
-    private void option3_changeVehicle(ParetoFront.Builder f, Profile.Builder p, int arrStopId,
+    private void option3_changeVehicle(ParetoFront.Builder frontBuild, Profile.Builder profile, int arrStopId,
                                        int arrMins, int connectionId) {
-        ParetoFront.Builder stationFront = p.forStation(arrStopId);
+        ParetoFront.Builder stationFront = profile.forStation(arrStopId);
         if (stationFront != null) {
             stationFront.forEach(tuple -> {
                 if (PackedCriteria.depMins(tuple) >= arrMins) {
@@ -82,43 +82,43 @@ public record Router(TimeTable timeTable) {
                                     PackedCriteria.withAdditionalChange(tuple),
                                     payload)
                     );
-                    f.add(t);
+                    frontBuild.add(t);
                 }
             });
         }
     }
 
-    private void updateTripFrontier(Profile.Builder p, ParetoFront.Builder f, int tripId) {
-        if (p.forTrip(tripId) == null) p.setForTrip(tripId, f);
-        else p.forTrip(tripId).addAll(f);
+    private void updateTripFrontier(Profile.Builder profile, ParetoFront.Builder frontBuild, int tripId) {
+        if (profile.forTrip(tripId) == null) profile.setForTrip(tripId, frontBuild);
+        else profile.forTrip(tripId).addAll(frontBuild);
     }
 
-    private void updateStationFrontiers(Profile.Builder p, ParetoFront.Builder f,
+    private void updateStationFrontiers(Profile.Builder profile, ParetoFront.Builder frontBuild,
                                         Transfers transfers, Connections connections,
                                         int depStationId, int depMins,
                                         int connectionId, int connTripPos) {
 
-        ParetoFront.Builder stationFront = p.forStation(depStationId);
-        boolean dominates = stationFront != null && stationFront.fullyDominates(f, depMins);
+        ParetoFront.Builder stationFront = profile.forStation(depStationId);
+        boolean dominates = stationFront != null && stationFront.fullyDominates(frontBuild, depMins);
         if (dominates) return;
 
         int packedRange = transfers.arrivingAt(depStationId);
         for (int i = PackedRange.startInclusive(packedRange); i < PackedRange.endExclusive(packedRange); i++) {
-            int d = depMins - transfers.minutes(i);
+            int currentDep = depMins - transfers.minutes(i);
             int fromStation = transfers.depStationId(i);
 
-            f.forEach(tuple -> {
+            frontBuild.forEach(tuple -> {
                 int payloadConnId = Bits32_24_8.unpack24(PackedCriteria.payload(tuple));
                 int stepCount = connections.tripPos(payloadConnId) - connTripPos;
                 int payload = Bits32_24_8.pack(connectionId, stepCount);
                 long updated = PackedCriteria.withDepMins(
                         PackedCriteria.withPayload(tuple, payload),
-                        d
+                        currentDep
                 );
-                if (p.forStation(fromStation) == null)
-                    p.setForStation(fromStation, new ParetoFront.Builder().add(updated));
+                if (profile.forStation(fromStation) == null)
+                    profile.setForStation(fromStation, new ParetoFront.Builder().add(updated));
                 else
-                    p.forStation(fromStation).add(updated);
+                    profile.forStation(fromStation).add(updated);
             });
         }
     }
