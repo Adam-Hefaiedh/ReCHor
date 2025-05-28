@@ -63,9 +63,7 @@ public record QueryUI(Node rootNode,
         DatePicker datePicker = new DatePicker(LocalDate.now());
         datePicker.setId("date");
 
-        DateTimeFormatter displayFmt = OUTPUT_FORMATTER;
-        DateTimeFormatter parseFmt = INPUT_FORMATTER;
-        LocalTimeStringConverter converter = new LocalTimeStringConverter(displayFmt, parseFmt);
+        LocalTimeStringConverter converter = new LocalTimeStringConverter(OUTPUT_FORMATTER, INPUT_FORMATTER);
 
         TextFormatter<LocalTime> tf = new TextFormatter<>(converter, LocalTime.now());
         TextField timeField = new TextField();
