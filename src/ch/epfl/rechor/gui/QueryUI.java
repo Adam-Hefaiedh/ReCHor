@@ -106,7 +106,7 @@ public record QueryUI(Node rootNode,
         StackPane buttonContainer = new StackPane(searchButton);
         buttonContainer.setPadding(new Insets(0, 150, 0, 10));
         mainLayout.setRight(buttonContainer);
-        VBox root = new VBox(10, topRow, bottomRow);
+        VBox root = new VBox(mainLayout);
         root.getStylesheets().add("query.css");
 
 
